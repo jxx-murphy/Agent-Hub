@@ -22,6 +22,9 @@
         },
         "FX": {
           "$className": "RemoteEvent"
+        },
+        "Quests": {
+          "$path": "src/shared/Quests.luau"
         }
       }
     },
@@ -40,6 +43,9 @@
       },
       "Main": {
         "$path": "src/server/Main.server.luau"
+      },
+      "World": {
+        "$path": "src/server/World.luau"
       }
     },
     "StarterPlayer": {

@@ -58,6 +58,10 @@ Vector3.__mul = function(a, b)
 	if type(a) == "number" then return vec3(b.X * a, b.Y * a, b.Z * a) end
 	return vec3(a.X * b.X, a.Y * b.Y, a.Z * b.Z)
 end
+Vector3.__div = function(a, b)
+	if type(b) == "number" then return vec3(a.X / b, a.Y / b, a.Z / b) end
+	return vec3(a.X / b.X, a.Y / b.Y, a.Z / b.Z)
+end
 Vector3.__eq = function(a, b) return a.X == b.X and a.Y == b.Y and a.Z == b.Z end
 Vector3.__tostring = function(a) return `({a.X}, {a.Y}, {a.Z})` end
 Vector3.__index = function(self, key)
@@ -241,6 +245,11 @@ local function newInstance(className)
 	properties.CFrame = newCFrame(vec3(0, 0, 0))
 	properties.Size = vec3(1, 1, 1)
 	properties.AssemblyLinearVelocity = vec3(0, 0, 0)
+	-- Roblox part defaults, so palette and material sweeps never read nil.
+	properties.Color = Color3Lib.fromRGB(163, 162, 165)
+	properties.Material = Enum.Material.Plastic
+	properties.Transparency = 0
+	properties.CanCollide = true
 	if className == "Humanoid" then
 		properties.MaxHealth = 100
 		properties.Health = 100
@@ -517,12 +526,16 @@ function stub.build(root)
 	config.Name = "Config"
 	config._modulePath = `{root}/src/shared/Config.luau`
 
+	local quests = Instance.new("ModuleScript", folder)
+	quests.Name = "Quests"
+	quests._modulePath = `{root}/src/shared/Quests.luau`
+
 	for _, name in { "Action", "State", "Notice", "Offer", "FX" } do
 		local remote = Instance.new("RemoteEvent", folder)
 		remote.Name = name
 	end
 
-	for _, entry in { { "Model", "Model" }, { "Receipt", "Receipt" }, { "Store", "Store" }, { "Commerce", "Commerce" } } do
+	for _, entry in { { "Model", "Model" }, { "Receipt", "Receipt" }, { "Store", "Store" }, { "Commerce", "Commerce" }, { "World", "World" } } do
 		local module = Instance.new("ModuleScript", ServerScriptService)
 		module.Name = entry[1]
 		module._modulePath = `{root}/src/server/{entry[2]}.luau`
@@ -663,9 +676,52 @@ function stub.enemies(zoneId)
 	local out = {}
 	local world = Workspace:FindFirstChild("SoulGrindWorld")
 	if not world then return out end
-	for _, child in world._children do
+	for _, child in world:GetDescendants() do
 		if child.ClassName == "Model" and child:GetAttribute("Enemy") then
 			if not zoneId or child:GetAttribute("Zone") == zoneId then table.insert(out, child) end
+		end
+	end
+	return out
+end
+
+function stub.livingEnemies(zoneId)
+	local out = {}
+	for _, enemy in stub.enemies(zoneId) do
+		local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid.Health > 0 then table.insert(out, enemy) end
+	end
+	return out
+end
+
+-- Every PointLight in the world, for the "did the lighting wash out again" budget.
+function stub.lightBudget()
+	local world = Workspace:FindFirstChild("SoulGrindWorld")
+	local count, load, brightest, longest = 0, 0, 0, 0
+	if not world then return { Count = 0, Load = 0, Brightest = 0, Longest = 0 } end
+	for _, node in world:GetDescendants() do
+		if node.ClassName == "PointLight" or node.ClassName == "SpotLight" then
+			count += 1
+			load += node.Brightness * node.Range
+			brightest = math.max(brightest, node.Brightness)
+			longest = math.max(longest, node.Range)
+		end
+	end
+	return { Count = count, Load = load, Brightest = brightest, Longest = longest }
+end
+
+-- Collect the text currently shown on the stone signs standing in the world.
+function stub.signText()
+	local world = Workspace:FindFirstChild("SoulGrindWorld")
+	local out = {}
+	if not world then return out end
+	for _, node in world:GetDescendants() do
+		if node.ClassName == "SurfaceGui" and node.Name == "SignFace" then
+			local heading, body
+			for _, deep in node:GetDescendants() do
+				if deep.Name == "Heading" then heading = deep.Text end
+				if deep.Name == "Body" then body = deep.Text end
+			end
+			table.insert(out, { Heading = heading, Body = body })
 		end
 	end
 	return out

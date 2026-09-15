@@ -1,4 +1,4 @@
-<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4"><External>null</External><External>nil</External><Item class="Workspace" referent="RBX21"><Properties><bool name="Archivable">true</bool><string name="Name">Workspace</string></Properties></Item><Item class="Lighting" referent="RBX22"><Properties><bool name="Archivable">true</bool><string name="Name">Lighting</string><token name="Technology">3</token><bool name="GlobalShadows">true</bool></Properties></Item><Item class="ReplicatedStorage" referent="RBX8"><Properties><bool name="Archivable">true</bool><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX7"><Properties><bool name="Archivable">true</bool><string name="Name">SoulGrind</string></Properties><Item class="ModuleScript" referent="RBX6"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Replace the zero IDs after creating the products in Creator Hub.
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4"><External>null</External><External>nil</External><Item class="Workspace" referent="RBX23"><Properties><bool name="Archivable">true</bool><string name="Name">Workspace</string></Properties></Item><Item class="Lighting" referent="RBX24"><Properties><bool name="Archivable">true</bool><string name="Name">Lighting</string><token name="Technology">3</token><bool name="GlobalShadows">true</bool></Properties></Item><Item class="ReplicatedStorage" referent="RBX9"><Properties><bool name="Archivable">true</bool><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX8"><Properties><bool name="Archivable">true</bool><string name="Name">SoulGrind</string></Properties><Item class="ModuleScript" referent="RBX6"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Replace the zero IDs after creating the products in Creator Hub.
 return {
 	DataStoreName = "SoulGrind_v1",
 	StudioPersistence = false,
@@ -9,10 +9,73 @@ return {
 	CheckInMinKills = 3,
 
 	-- Shared by the server (authority) and the client (target plate, cooldown sweeps).
-	-- One source of truth stops the HUD from promising a reach the server will not honour.
+	-- One source of truth stops the HUD from promising a reach the server will refuse.
 	AttackRange = 34,
 	PulseRange = 22,
 	Cooldowns = { Attack = 0.34, Finisher = 0.52, Pulse = 8, Dash = 3 },
+
+	-- Enemies hold a post. They wake when you come close, chase while you stay inside
+	-- the leash, then walk home and heal. Nothing follows you across the map forever.
+	Aggro = {
+		Engage = 44,
+		Leash = 86,
+		ReturnSpeed = 1.4,
+		RegenPerSecond = 9,
+		CalmSeconds = 4,
+	},
+
+	-- Crimson and gold. Neon is reserved for flame cores, lava seams and the boss
+	-- telegraph; every other surface is a real material lit by real lights.
+	Palette = {
+		Bedrock = Color3.fromRGB(34, 27, 29),
+		Rock = Color3.fromRGB(52, 42, 44),
+		RockLight = Color3.fromRGB(74, 60, 60),
+		Floor = Color3.fromRGB(96, 78, 76),
+		FloorAlt = Color3.fromRGB(116, 95, 90),
+		Stone = Color3.fromRGB(134, 112, 106),
+		StoneDark = Color3.fromRGB(94, 74, 76),
+		Bone = Color3.fromRGB(212, 201, 182),
+		Gold = Color3.fromRGB(201, 162, 74),
+		GoldLight = Color3.fromRGB(232, 200, 120),
+		GoldPale = Color3.fromRGB(255, 233, 168),
+		Crimson = Color3.fromRGB(140, 35, 32),
+		CrimsonMid = Color3.fromRGB(184, 54, 47),
+		CrimsonLit = Color3.fromRGB(217, 82, 74),
+		Iron = Color3.fromRGB(58, 52, 54),
+		Ember = Color3.fromRGB(224, 138, 60),
+	},
+
+	-- Progression spends souls on the moves themselves, not only on a damage number.
+	-- Order is the display order in the Journal.
+	Abilities = {
+		{
+			Key = "Strike",
+			Name = "Soul Strike",
+			Detail = "+14% strike damage per rank. Rank 3 makes the finisher knock back everything nearby.",
+			Max = 5,
+			BaseCost = 45,
+			Growth = 1.6,
+			RequiresLevel = 1,
+		},
+		{
+			Key = "Pulse",
+			Name = "Soul Pulse",
+			Detail = "+4 studs radius and +12% damage per rank.",
+			Max = 5,
+			BaseCost = 70,
+			Growth = 1.65,
+			RequiresLevel = 3,
+		},
+		{
+			Key = "Step",
+			Name = "Soul Step",
+			Detail = "-0.4s cooldown and a longer phase window per rank.",
+			Max = 4,
+			BaseCost = 55,
+			Growth = 1.7,
+			RequiresLevel = 1,
+		},
+	},
 
 	Products = {
 		FlarePack = {
@@ -32,32 +95,644 @@ return {
 		},
 	},
 
+	-- Half-extents of the walkable arena. The old 146x106 pad felt like a waiting room.
+	ArenaHalf = Vector3.new(140, 0, 110),
+
 	Zones = {
 		[1] = {
 			Name = "Cinder Hollow",
 			Origin = Vector3.new(0, 0, 0),
-			Color = Color3.fromRGB(168, 96, 226),
-			Ground = Color3.fromRGB(62, 53, 78),
-			GroundAlt = Color3.fromRGB(78, 68, 98),
-			Stone = Color3.fromRGB(104, 94, 124),
+			Accent = Color3.fromRGB(184, 54, 47),
+			AccentLight = Color3.fromRGB(217, 82, 74),
+			Floor = Color3.fromRGB(96, 78, 76),
+			FloorAlt = Color3.fromRGB(116, 95, 90),
+			Stone = Color3.fromRGB(134, 112, 106),
 			EnemyHealth = 36,
 			EnemyDamage = 7,
 			SoulReward = 10,
 		},
 		[2] = {
-			Name = "Frozen Purgatory",
-			Origin = Vector3.new(220, 0, 0),
-			Color = Color3.fromRGB(86, 186, 226),
-			Ground = Color3.fromRGB(50, 66, 86),
-			GroundAlt = Color3.fromRGB(64, 82, 104),
-			Stone = Color3.fromRGB(104, 122, 142),
+			Name = "Molten Reliquary",
+			Origin = Vector3.new(520, 0, 0),
+			Accent = Color3.fromRGB(201, 162, 74),
+			AccentLight = Color3.fromRGB(232, 200, 120),
+			Floor = Color3.fromRGB(104, 84, 70),
+			FloorAlt = Color3.fromRGB(126, 102, 82),
+			Stone = Color3.fromRGB(142, 120, 96),
 			EnemyHealth = 95,
 			EnemyDamage = 12,
 			SoulReward = 28,
 		},
 	},
 }
-</ProtectedString><string name="Name">Config</string></Properties></Item><Item class="RemoteEvent" referent="RBX1"><Properties><bool name="Archivable">true</bool><string name="Name">Action</string></Properties></Item><Item class="RemoteEvent" referent="RBX2"><Properties><bool name="Archivable">true</bool><string name="Name">State</string></Properties></Item><Item class="RemoteEvent" referent="RBX3"><Properties><bool name="Archivable">true</bool><string name="Name">Notice</string></Properties></Item><Item class="RemoteEvent" referent="RBX4"><Properties><bool name="Archivable">true</bool><string name="Name">Offer</string></Properties></Item><Item class="RemoteEvent" referent="RBX5"><Properties><bool name="Archivable">true</bool><string name="Name">FX</string></Properties></Item></Item></Item><Item class="ServerScriptService" referent="RBX14"><Properties><bool name="Archivable">true</bool><string name="Name">ServerScriptService</string></Properties><Item class="ModuleScript" referent="RBX9"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local Model = {}
+</ProtectedString><string name="Name">Config</string></Properties></Item><Item class="ModuleScript" referent="RBX7"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- The game already had a progression; it just never told anyone about it. This turns
+-- that progression into a named, ordered, checkable list that the server grants from and
+-- the client, the world signs and the objective banner all read from.
+--
+-- Progress is derived from the profile, never stored separately, so a quest can never
+-- disagree with the save. Only the "already paid out" set is stored.
+
+local Quests = {}
+
+Quests.list = {
+	{
+		Id = "FirstSoul",
+		Title = "First Blood",
+		Detail = "Strike down a single Cinder Shade.",
+		Hint = "Walk up to a shade and press F, or click it.",
+		Target = 1,
+		Reward = 15,
+		Progress = function(profile) return profile.Kills end,
+	},
+	{
+		Id = "CullTheHollow",
+		Title = "Cull the Hollow",
+		Detail = "Defeat 10 of the hollow things in Cinder Hollow.",
+		Hint = "Shades are weakest, Reavers hit hardest, Wisps are fastest.",
+		Target = 10,
+		Reward = 30,
+		Progress = function(profile) return profile.Kills end,
+	},
+	{
+		Id = "SoulPower",
+		Title = "Kindle the Soul",
+		Detail = "Reach Soul Level 3 to unlock Soul Pulse.",
+		Hint = "Spend souls on UPGRADE in the Journal.",
+		Target = 3,
+		Reward = 40,
+		Progress = function(profile) return profile.Level end,
+	},
+	{
+		Id = "SharpenTheBlade",
+		Title = "Sharpen the Blade",
+		Detail = "Buy your first move upgrade.",
+		Hint = "The MOVES tab in the Journal ranks up Strike, Pulse and Step.",
+		Target = 1,
+		Reward = 35,
+		Progress = function(profile)
+			local total = 0
+			for _, rank in profile.Upgrades do total += rank end
+			return total
+		end,
+	},
+	{
+		Id = "AshGate",
+		Title = "Open the Ash Gate",
+		Detail = "Gather 150 souls and break the seal on the Ash Gate.",
+		Hint = "The gate is the tall arch at the far end of the hollow.",
+		Target = 2,
+		Reward = 60,
+		Progress = function(profile) return profile.MaxZone end,
+	},
+	{
+		Id = "IntoTheDeep",
+		Title = "Into the Reliquary",
+		Detail = "Defeat 5 of the guardians beyond the gate.",
+		Hint = "They hit far harder than anything in the hollow. Soul Step through them.",
+		Target = 5,
+		Reward = 90,
+		Progress = function(profile) return profile.DeepKills end,
+	},
+	{
+		Id = "WardenSigil",
+		Title = "Bind the Gilded Warden",
+		Detail = "Defeat the Warden at the heart of the Reliquary.",
+		Hint = "It telegraphs a slam. Soul Step (E) passes straight through it.",
+		Target = 1,
+		Reward = 150,
+		Progress = function(profile) return profile.Bosses end,
+	},
+	{
+		Id = "Reborn",
+		Title = "Rebirth",
+		Detail = "Gather 500 souls and be reborn for a permanent +10% damage.",
+		Hint = "Rebirth keeps your zones, sigils and move ranks.",
+		Target = 1,
+		Reward = 200,
+		Progress = function(profile) return profile.Rebirths end,
+	},
+}
+
+Quests.count = #Quests.list
+
+function Quests.byId(id)
+	for _, quest in Quests.list do
+		if quest.Id == id then return quest end
+	end
+	return nil
+end
+
+-- One pass produces everything any surface needs: the per-quest rows for the guide,
+-- the current objective for the banner and the world signs, and the completion rate.
+function Quests.snapshot(profile)
+	local rows = {}
+	local completed = 0
+	local active
+
+	for index, quest in Quests.list do
+		local raw = quest.Progress(profile)
+		local value = math.clamp(type(raw) == "number" and raw or 0, 0, quest.Target)
+		local done = value &gt;= quest.Target
+		if done then completed += 1 end
+
+		local row = {
+			Id = quest.Id,
+			Title = quest.Title,
+			Detail = quest.Detail,
+			Hint = quest.Hint,
+			Value = value,
+			Target = quest.Target,
+			Reward = quest.Reward,
+			Done = done,
+			Order = index,
+		}
+		rows[index] = row
+		if not done and not active then active = row end
+	end
+
+	return {
+		Rows = rows,
+		Active = active,
+		Completed = completed,
+		Total = Quests.count,
+		-- Task completion rate, as a percentage, for the HUD and the guide header.
+		Rate = math.floor(completed / Quests.count * 100 + 0.5),
+	}
+end
+
+return Quests
+</ProtectedString><string name="Name">Quests</string></Properties></Item><Item class="RemoteEvent" referent="RBX1"><Properties><bool name="Archivable">true</bool><string name="Name">Action</string></Properties></Item><Item class="RemoteEvent" referent="RBX2"><Properties><bool name="Archivable">true</bool><string name="Name">State</string></Properties></Item><Item class="RemoteEvent" referent="RBX3"><Properties><bool name="Archivable">true</bool><string name="Name">Notice</string></Properties></Item><Item class="RemoteEvent" referent="RBX4"><Properties><bool name="Archivable">true</bool><string name="Name">Offer</string></Properties></Item><Item class="RemoteEvent" referent="RBX5"><Properties><bool name="Archivable">true</bool><string name="Name">FX</string></Properties></Item></Item></Item><Item class="ServerScriptService" referent="RBX16"><Properties><bool name="Archivable">true</bool><string name="Name">ServerScriptService</string></Properties><Item class="ModuleScript" referent="RBX10"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Everything the player looks at. Split out of Main because the arena grew past the
+-- point where world construction and the game loop belonged in one file.
+--
+-- Art direction: crimson and gold. Real materials lit by real firelight. Emissive
+-- surfaces are rationed to flame cores, lava seams, gold sigils and the boss telegraph,
+-- because the previous pass proved that neon on every surface reads as a white smear.
+
+local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+local Config = require(ReplicatedStorage:WaitForChild("SoulGrind").Config)
+
+local World = {}
+local palette = Config.Palette
+local HALF = Config.ArenaHalf
+local FLOOR_Y = 1.5
+
+local signBoards = {}
+
+local function makePart(parent, name, size, cframe, color, material)
+	local part = Instance.new("Part")
+	part.Name = name
+	part.Size = size
+	part.CFrame = cframe
+	part.Anchored = true
+	part.Color = color
+	part.Material = material or Enum.Material.Slate
+	part.TopSurface = Enum.SurfaceType.Smooth
+	part.BottomSurface = Enum.SurfaceType.Smooth
+	part.Parent = parent
+	return part
+end
+
+local function decor(parent, name, size, cframe, color, material)
+	local part = makePart(parent, name, size, cframe, color, material)
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+	return part
+end
+
+World.makePart = makePart
+
+local function addLabel(part, text, color, height, maxDistance)
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = "WorldLabel"
+	billboard.Size = UDim2.fromOffset(320, 56)
+	billboard.StudsOffset = Vector3.new(0, height or 5, 0)
+	billboard.AlwaysOnTop = true
+	billboard.MaxDistance = maxDistance or 700
+	billboard.Parent = part
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.fromScale(1, 1)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.TextColor3 = color
+	label.TextStrokeTransparency = 0.05
+	label.TextStrokeColor3 = Color3.fromRGB(12, 6, 8)
+	label.Font = Enum.Font.GothamBlack
+	label.TextScaled = true
+	label.Parent = billboard
+	return label
+end
+
+-- Lighting ------------------------------------------------------------------
+-- Tuned between two failures: a near-black map, and a whiteout caused by stacking
+-- ambient, exposure, bloom and two dozen overlapping lights. The floor is bright
+-- enough to silhouette an enemy; everything past the colonnade falls into shadow.
+function World.applyLighting()
+	Lighting.ClockTime = 1.6
+	Lighting.GeographicLatitude = 24
+	Lighting.Brightness = 1.7
+	Lighting.ExposureCompensation = 0.05
+	Lighting.Ambient = Color3.fromRGB(64, 52, 52)
+	Lighting.OutdoorAmbient = Color3.fromRGB(76, 61, 58)
+	Lighting.FogColor = Color3.fromRGB(38, 24, 26)
+	Lighting.FogStart = 190
+	Lighting.FogEnd = 1150
+	Lighting.EnvironmentDiffuseScale = 0.3
+	Lighting.EnvironmentSpecularScale = 0.2
+	Lighting.GlobalShadows = true
+
+	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
+	atmosphere.Density = 0.27
+	atmosphere.Haze = 1.4
+	atmosphere.Glare = 0.05
+	atmosphere.Offset = 0.2
+	atmosphere.Color = Color3.fromRGB(152, 112, 98)
+	atmosphere.Decay = Color3.fromRGB(52, 26, 28)
+	atmosphere.Parent = Lighting
+
+	local function effect(className, name, properties)
+		local instance = Lighting:FindFirstChild(name) or Instance.new(className)
+		instance.Name = name
+		for property, value in properties do instance[property] = value end
+		instance.Parent = Lighting
+	end
+
+	effect("BloomEffect", "SoulBloom", { Intensity = 0.2, Size = 20, Threshold = 2.4 })
+	effect("ColorCorrectionEffect", "UnderworldGrade", {
+		Brightness = 0, Contrast = 0.15, Saturation = 0.02, TintColor = Color3.fromRGB(255, 240, 228),
+	})
+	-- Depth of field blurs the silhouettes the player needs. Removed on purpose.
+	local staleDepth = Lighting:FindFirstChild("SoulDepth")
+	if staleDepth then staleDepth:Destroy() end
+end
+
+-- Pieces --------------------------------------------------------------------
+
+local function brazier(parent, position, accent)
+	makePart(parent, "BrazierColumn", Vector3.new(2.4, 7, 2.4), CFrame.new(position + Vector3.new(0, 3.5, 0)), palette.Stone, Enum.Material.Marble)
+	makePart(parent, "BrazierBowl", Vector3.new(4.4, 1.6, 4.4), CFrame.new(position + Vector3.new(0, 7.6, 0)), palette.Iron, Enum.Material.Metal)
+	decor(parent, "BrazierRim", Vector3.new(5, 0.5, 5), CFrame.new(position + Vector3.new(0, 8.4, 0)), palette.Gold, Enum.Material.Metal)
+
+	local flame = decor(parent, "BrazierFlame", Vector3.new(2.6, 2.6, 2.6), CFrame.new(position + Vector3.new(0, 9, 0)), palette.Ember, Enum.Material.Neon)
+	flame.Shape = Enum.PartType.Ball
+
+	local light = Instance.new("PointLight")
+	light.Color = Color3.fromRGB(255, 170, 96)
+	light.Brightness = 2.4
+	light.Range = 48
+	light.Shadows = true
+	light.Parent = flame
+
+	local fire = Instance.new("ParticleEmitter")
+	fire.Texture = "rbxasset://textures/particles/fire_main.dds"
+	fire.Color = ColorSequence.new(palette.GoldPale, accent)
+	fire.LightEmission = 0.9
+	fire.Lifetime = NumberRange.new(0.5, 0.9)
+	fire.Rate = 30
+	fire.Size = NumberSequence.new(3.4)
+	fire.Speed = NumberRange.new(2, 5)
+	fire.SpreadAngle = Vector2.new(16, 16)
+	fire.Parent = flame
+end
+
+-- The colonnade is most of the reason the arena reads as a place rather than a pad.
+local function pillar(parent, position, accent, height)
+	height = height or 26
+	makePart(parent, "PillarBase", Vector3.new(7, 2, 7), CFrame.new(position + Vector3.new(0, 1, 0)), palette.StoneDark, Enum.Material.Marble)
+	makePart(parent, "PillarShaft", Vector3.new(5, height, 5), CFrame.new(position + Vector3.new(0, 2 + height / 2, 0)), palette.Stone, Enum.Material.Marble)
+	decor(parent, "PillarBand", Vector3.new(5.4, 0.8, 5.4), CFrame.new(position + Vector3.new(0, 2 + height * 0.62, 0)), palette.Gold, Enum.Material.Metal)
+	makePart(parent, "PillarCapital", Vector3.new(7.6, 2.4, 7.6), CFrame.new(position + Vector3.new(0, 3.2 + height, 0)), palette.StoneDark, Enum.Material.Marble)
+
+	-- Crimson banner with a gold hem. Cloth reads as civilisation; bare rock does not.
+	local banner = decor(parent, "Banner", Vector3.new(4.2, 13, 0.3), CFrame.new(position + Vector3.new(0, 2 + height * 0.5, -2.7)), accent, Enum.Material.Fabric)
+	decor(parent, "BannerHem", Vector3.new(4.2, 0.7, 0.4), banner.CFrame * CFrame.new(0, -6.5, 0), palette.Gold, Enum.Material.Metal)
+end
+
+local function bonePile(parent, position)
+	for index = 1, 5 do
+		local angle = index * 1.27
+		decor(parent, "Bone", Vector3.new(0.6, 3.2, 0.6),
+			CFrame.new(position + Vector3.new(math.cos(angle) * 1.8, 1.2, math.sin(angle) * 1.8))
+				* CFrame.Angles(math.rad(70 + index * 9), angle, 0),
+			palette.Bone, Enum.Material.Marble)
+	end
+	local skull = decor(parent, "Skull", Vector3.new(1.6, 1.6, 1.6), CFrame.new(position + Vector3.new(0, 0.9, 0)), palette.Bone, Enum.Material.Marble)
+	skull.Shape = Enum.PartType.Ball
+end
+
+-- A sign the player can actually read, and that rewrites itself as the quest changes.
+local function signPost(parent, cframe, heading, body, accent)
+	local post = makePart(parent, "SignPost", Vector3.new(1.2, 9, 1.2), cframe * CFrame.new(0, 4.5, 0), palette.Iron, Enum.Material.Metal)
+	local board = makePart(parent, "SignBoard", Vector3.new(17, 9, 0.8), cframe * CFrame.new(0, 11, 0), palette.StoneDark, Enum.Material.Marble)
+	decor(parent, "SignFrame", Vector3.new(18, 10, 0.5), cframe * CFrame.new(0, 11, 0.25), palette.Gold, Enum.Material.Metal)
+	post.CanCollide = false
+
+	local surface = Instance.new("SurfaceGui")
+	surface.Name = "SignFace"
+	surface.Face = Enum.NormalId.Back
+	surface.CanvasSize = Vector2.new(560, 300)
+	surface.LightInfluence = 0.25
+	surface.MaxDistance = 320
+	surface.Parent = board
+
+	local backing = Instance.new("Frame")
+	backing.Size = UDim2.fromScale(1, 1)
+	backing.BackgroundColor3 = Color3.fromRGB(26, 16, 18)
+	backing.BackgroundTransparency = 0.15
+	backing.BorderSizePixel = 0
+	backing.Parent = surface
+
+	local title = Instance.new("TextLabel")
+	title.Name = "Heading"
+	title.Size = UDim2.new(1, -30, 0, 74)
+	title.Position = UDim2.fromOffset(15, 14)
+	title.BackgroundTransparency = 1
+	title.Font = Enum.Font.GothamBlack
+	title.TextColor3 = palette.GoldPale
+	title.TextScaled = true
+	title.Text = heading
+	title.Parent = backing
+
+	local rule = Instance.new("Frame")
+	rule.Size = UDim2.new(1, -30, 0, 3)
+	rule.Position = UDim2.fromOffset(15, 92)
+	rule.BackgroundColor3 = palette.Gold
+	rule.BorderSizePixel = 0
+	rule.Parent = backing
+
+	local detail = Instance.new("TextLabel")
+	detail.Name = "Body"
+	detail.Size = UDim2.new(1, -30, 1, -118)
+	detail.Position = UDim2.fromOffset(15, 106)
+	detail.BackgroundTransparency = 1
+	detail.Font = Enum.Font.GothamMedium
+	detail.TextColor3 = Color3.fromRGB(236, 222, 206)
+	detail.TextSize = 30
+	detail.TextWrapped = true
+	detail.TextYAlignment = Enum.TextYAlignment.Top
+	detail.Text = body
+	detail.Parent = backing
+
+	local lamp = Instance.new("PointLight")
+	lamp.Color = palette.GoldLight
+	lamp.Brightness = 1.2
+	lamp.Range = 22
+	lamp.Parent = board
+
+	decor(parent, "SignGlow", Vector3.new(16, 0.4, 0.4), cframe * CFrame.new(0, 16.2, 0.4), palette.Gold, Enum.Material.Neon)
+	addLabel(board, heading, palette.GoldPale, 8, 260)
+	return { Heading = title, Body = detail, Board = board, Accent = accent }
+end
+
+-- Quest signs all show the same current objective, so wherever the player is standing
+-- there is something nearby that answers "what am I supposed to be doing".
+function World.registerQuestSign(entry)
+	table.insert(signBoards, entry)
+end
+
+function World.setObjective(heading, body)
+	for _, entry in signBoards do
+		entry.Heading.Text = heading
+		entry.Body.Text = body
+		local label = entry.Board:FindFirstChild("WorldLabel")
+		if label and label:FindFirstChildOfClass("TextLabel") then
+			label:FindFirstChildOfClass("TextLabel").Text = heading
+		end
+	end
+end
+
+-- Backdrop ------------------------------------------------------------------
+-- The old horizon was empty fog. A silhouette ring gives the sky something to cut
+-- against, which is most of what "the background is ugly" actually meant.
+local function buildBackdrop(parent, center)
+	local folder = Instance.new("Folder")
+	folder.Name = "Backdrop"
+	folder.Parent = parent
+
+	for index = 1, 26 do
+		local angle = index * math.pi * 2 / 26
+		local radius = 330 + (index % 4) * 46
+		local height = 120 + (index % 5) * 74
+		local position = center + Vector3.new(math.cos(angle) * radius, height / 2 - 20, math.sin(angle) * radius)
+		local spire = decor(folder, "Spire", Vector3.new(26 + (index % 3) * 12, height, 26 + (index % 3) * 12),
+			CFrame.new(position) * CFrame.Angles(math.rad((index % 3) - 1), angle, math.rad((index % 5) - 2)),
+			index % 2 == 0 and palette.Rock or palette.Bedrock, Enum.Material.Basalt)
+		spire.CastShadow = false
+		if index % 4 == 0 then
+			local seam = decor(folder, "SpireSeam", Vector3.new(2.4, height * 0.5, 2.4), spire.CFrame * CFrame.new(0, -height * 0.2, -14), palette.Crimson, Enum.Material.Neon)
+			seam.Transparency = 0.35
+			seam.CastShadow = false
+		end
+	end
+
+	for index = 1, 18 do
+		local angle = index * math.pi * 2 / 18 + 0.3
+		local radius = 780 + (index % 3) * 180
+		local height = 340 + (index % 4) * 150
+		local ridge = decor(folder, "FarRidge", Vector3.new(230, height, 230),
+			CFrame.new(center + Vector3.new(math.cos(angle) * radius, height / 2 - 90, math.sin(angle) * radius))
+				* CFrame.Angles(0, angle, math.rad((index % 3) * 3)),
+			palette.Bedrock, Enum.Material.Basalt)
+		ridge.CastShadow = false
+	end
+end
+
+-- Zone ----------------------------------------------------------------------
+
+local function buildZone(zoneId, zone, world)
+	local folder = Instance.new("Folder")
+	folder.Name = zone.Name:gsub(" ", "")
+	folder.Parent = world
+
+	local origin = zone.Origin
+	local accent, accentLight = zone.Accent, zone.AccentLight
+
+	makePart(folder, "Bedrock", Vector3.new(HALF.X * 2 + 40, 12, HALF.Z * 2 + 40), CFrame.new(origin - Vector3.new(0, 6, 0)), palette.Bedrock, Enum.Material.Basalt)
+	makePart(folder, "ArenaFloor", Vector3.new(HALF.X * 2, 3, HALF.Z * 2), CFrame.new(origin), zone.Floor, Enum.Material.Slate)
+
+	-- Lighter paving bands give distance cues without a glowing grid.
+	for band = -3, 3 do
+		decor(folder, "Paving", Vector3.new(HALF.X * 2 - 24, 0.4, 16), CFrame.new(origin + Vector3.new(0, FLOOR_Y, band * 32)), zone.FloorAlt, Enum.Material.Concrete)
+	end
+	-- Lava seams: the only emissive thing on the ground, and they earn it.
+	for seam = -2, 2 do
+		local crack = decor(folder, "LavaSeam", Vector3.new(1.8, 0.35, HALF.Z * 1.7), CFrame.new(origin + Vector3.new(seam * 52 + 9, FLOOR_Y + 0.05, 0)) * CFrame.Angles(0, math.rad(seam * 3), 0), palette.CrimsonLit, Enum.Material.Neon)
+		crack.Transparency = 0.25
+		crack.CastShadow = false
+	end
+
+	-- Perimeter walls: the arena stops being a floating slab.
+	for side = -1, 1, 2 do
+		makePart(folder, "RampartX", Vector3.new(14, 42, HALF.Z * 2 + 28), CFrame.new(origin + Vector3.new(side * (HALF.X + 7), 19, 0)), palette.Rock, Enum.Material.Basalt)
+		makePart(folder, "RampartZ", Vector3.new(HALF.X * 2 + 28, 42, 14), CFrame.new(origin + Vector3.new(0, 19, side * (HALF.Z + 7))), palette.Rock, Enum.Material.Basalt)
+		decor(folder, "RampartCap", Vector3.new(16, 1.4, HALF.Z * 2 + 30), CFrame.new(origin + Vector3.new(side * (HALF.X + 7), 40.5, 0)), palette.Gold, Enum.Material.Metal)
+	end
+
+	-- Colonnade down both long sides.
+	for index = -3, 3 do
+		for side = -1, 1, 2 do
+			pillar(folder, origin + Vector3.new(side * (HALF.X - 26), FLOOR_Y, index * 30), accent, 26 + (index % 2) * 5)
+		end
+	end
+
+	-- Braziers: the arena's actual light. Five a side, evenly spaced.
+	for index = -2, 2 do
+		for side = -1, 1, 2 do
+			brazier(folder, origin + Vector3.new(side * (HALF.X - 62), FLOOR_Y, index * 46), accentLight)
+		end
+	end
+
+	-- Spawn plaza, raised and gold-rimmed so the entrance reads as the entrance.
+	local plazaZ = HALF.Z - 22
+	makePart(folder, "Plaza", Vector3.new(74, 2.4, 52), CFrame.new(origin + Vector3.new(0, FLOOR_Y + 1.2, plazaZ)), palette.Stone, Enum.Material.Marble)
+	decor(folder, "PlazaTrim", Vector3.new(78, 0.7, 56), CFrame.new(origin + Vector3.new(0, FLOOR_Y + 2.4, plazaZ)), palette.Gold, Enum.Material.Metal)
+	for side = -1, 1, 2 do
+		pillar(folder, origin + Vector3.new(side * 30, FLOOR_Y + 2.4, plazaZ + 16), accent, 18)
+		bonePile(folder, origin + Vector3.new(side * 54, FLOOR_Y, plazaZ - 30))
+	end
+
+	-- Central monument. Non-collidable: enemies steer with MoveTo and have no
+	-- pathfinding, so a solid block in the middle of the arena is a trap.
+	local base = origin + Vector3.new(0, FLOOR_Y, 0)
+	decor(folder, "MonumentStep", Vector3.new(26, 1.4, 26), CFrame.new(base + Vector3.new(0, 0.7, 0)), palette.Stone, Enum.Material.Marble)
+	decor(folder, "MonumentPlinth", Vector3.new(18, 3, 18), CFrame.new(base + Vector3.new(0, 2.9, 0)), palette.StoneDark, Enum.Material.Marble)
+	decor(folder, "MonumentShaft", Vector3.new(9, 54, 9), CFrame.new(base + Vector3.new(0, 31, 0)), palette.Rock, Enum.Material.Basalt)
+	for ring = 1, 4 do
+		decor(folder, "MonumentSigil", Vector3.new(9.6, 1.1, 9.6), CFrame.new(base + Vector3.new(0, 10 + ring * 11, 0)), palette.Gold, Enum.Material.Metal)
+	end
+	local heart = decor(folder, "MonumentHeart", Vector3.new(3, 40, 1.2), CFrame.new(base + Vector3.new(0, 30, -4.6)), accent, Enum.Material.Neon)
+	heart.Transparency = 0.2
+	local crown = decor(folder, "MonumentCrown", Vector3.new(7, 7, 7), CFrame.new(base + Vector3.new(0, 60, 0)), palette.Gold, Enum.Material.Metal)
+	crown.Shape = Enum.PartType.Ball
+	addLabel(crown, zone.Name:upper(), palette.GoldPale, 9, 900)
+
+	-- Quest signage. One at the spawn plaza where the player lands, one mid-arena.
+	World.registerQuestSign(signPost(folder, CFrame.new(origin + Vector3.new(0, FLOOR_Y + 2.4, plazaZ - 22)), "OBJECTIVE", "Loading your charge...", accent))
+	World.registerQuestSign(signPost(folder, CFrame.new(origin + Vector3.new(-46, FLOOR_Y, -8)) * CFrame.Angles(0, math.rad(34), 0), "OBJECTIVE", "Loading your charge...", accent))
+
+	return folder, plazaZ
+end
+
+-- Gates ---------------------------------------------------------------------
+
+local function archway(parent, position, accent, title)
+	makePart(parent, "GatePillar", Vector3.new(9, 34, 10), CFrame.new(position + Vector3.new(-15, 17, 0)), palette.StoneDark, Enum.Material.Marble)
+	makePart(parent, "GatePillar", Vector3.new(9, 34, 10), CFrame.new(position + Vector3.new(15, 17, 0)), palette.StoneDark, Enum.Material.Marble)
+	makePart(parent, "GateLintel", Vector3.new(42, 8, 10), CFrame.new(position + Vector3.new(0, 36, 0)), palette.Rock, Enum.Material.Basalt)
+	decor(parent, "GateTrim", Vector3.new(44, 1.6, 11), CFrame.new(position + Vector3.new(0, 40.4, 0)), palette.Gold, Enum.Material.Metal)
+	for side = -1, 1, 2 do
+		decor(parent, "GateSigil", Vector3.new(1.4, 22, 1.4), CFrame.new(position + Vector3.new(side * 15, 18, -5.2)), palette.Gold, Enum.Material.Neon)
+	end
+
+	local veil = decor(parent, "GateVeil", Vector3.new(28, 30, 1), CFrame.new(position + Vector3.new(0, 17, 0)), accent, Enum.Material.ForceField)
+	veil.Transparency = 0.3
+
+	local light = Instance.new("PointLight")
+	light.Color = accent
+	light.Brightness = 2.2
+	light.Range = 46
+	light.Parent = veil
+
+	addLabel(veil, title, palette.GoldPale, 19, 900)
+	return veil
+end
+
+-- Build ---------------------------------------------------------------------
+
+function World.build()
+	local existing = Workspace:FindFirstChild("SoulGrindWorld")
+	if existing then existing:Destroy() end
+	table.clear(signBoards)
+
+	local world = Instance.new("Folder")
+	world.Name = "SoulGrindWorld"
+	world.Parent = Workspace
+
+	World.applyLighting()
+
+	local plazaZ
+	for zoneId, zone in Config.Zones do
+		local _, z = buildZone(zoneId, zone, world)
+		plazaZ = plazaZ or z
+	end
+
+	buildBackdrop(world, (Config.Zones[1].Origin + Config.Zones[2].Origin) / 2)
+
+	local zoneOne, zoneTwo = Config.Zones[1], Config.Zones[2]
+	local spawnPosition = zoneOne.Origin + Vector3.new(0, FLOOR_Y + 3.6, plazaZ)
+
+	local spawnPad = Instance.new("SpawnLocation")
+	spawnPad.Name = "UnderworldSpawn"
+	spawnPad.Size = Vector3.new(16, 1.2, 16)
+	spawnPad.CFrame = CFrame.new(spawnPosition)
+	spawnPad.Anchored = true
+	spawnPad.Neutral = true
+	spawnPad.Color = palette.Gold
+	spawnPad.Material = Enum.Material.Metal
+	spawnPad.Parent = world
+
+	local gateVeil = archway(world, zoneOne.Origin + Vector3.new(0, FLOOR_Y, -HALF.Z + 16), zoneOne.Accent, "THE ASH GATE   •   150 SOULS")
+	local gatePrompt = Instance.new("ProximityPrompt")
+	gatePrompt.ActionText = "Open the Ash Gate"
+	gatePrompt.ObjectText = "Molten Reliquary"
+	gatePrompt.HoldDuration = 0.4
+	gatePrompt.MaxActivationDistance = 18
+	gatePrompt.RequiresLineOfSight = false
+	gatePrompt.Parent = gateVeil
+
+	local returnVeil = archway(world, zoneTwo.Origin + Vector3.new(0, FLOOR_Y, HALF.Z - 16), zoneTwo.Accent, "RETURN TO CINDER HOLLOW")
+	local returnPrompt = Instance.new("ProximityPrompt")
+	returnPrompt.ActionText = "Return"
+	returnPrompt.ObjectText = "Cinder Hollow"
+	returnPrompt.HoldDuration = 0.25
+	returnPrompt.MaxActivationDistance = 18
+	returnPrompt.RequiresLineOfSight = false
+	returnPrompt.Parent = returnVeil
+
+	return {
+		Folder = world,
+		GatePrompt = gatePrompt,
+		ReturnPrompt = returnPrompt,
+		PlazaZ = plazaZ,
+		FloorY = FLOOR_Y,
+	}
+end
+
+-- Enemy posts. Spread across the bigger arena so the map has fights in it rather
+-- than one clump by the spawn.
+function World.posts(zoneId)
+	local list = {
+		Vector3.new(0, FLOOR_Y, 52),
+		Vector3.new(-46, FLOOR_Y, 30),
+		Vector3.new(48, FLOOR_Y, 26),
+		Vector3.new(-82, FLOOR_Y, -12),
+		Vector3.new(78, FLOOR_Y, -18),
+		Vector3.new(-26, FLOOR_Y, -46),
+		Vector3.new(30, FLOOR_Y, -54),
+		Vector3.new(-60, FLOOR_Y, -80),
+		Vector3.new(0, FLOOR_Y, -86),
+	}
+	local origin = Config.Zones[zoneId].Origin
+	local out = {}
+	for index, offset in list do out[index] = origin + offset end
+	return out
+end
+
+World.spawnCFrame = function()
+	return CFrame.new(Config.Zones[1].Origin + Vector3.new(0, FLOOR_Y + 6, HALF.Z - 22))
+end
+
+World.arrivalCFrame = function(zoneId)
+	return CFrame.new(Config.Zones[zoneId].Origin + Vector3.new(0, FLOOR_Y + 6, HALF.Z - 22))
+end
+
+return World
+</ProtectedString><string name="Name">World</string></Properties></Item><Item class="ModuleScript" referent="RBX11"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local Model = {}
+
+local ABILITY_KEYS = { "Strike", "Pulse", "Step" }
 
 local function number(value, fallback, minimum)
 	if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
@@ -80,6 +755,7 @@ function Model.new(now)
 		Rebirths = 0,
 		MaxZone = 1,
 		Kills = 0,
+		DeepKills = 0,
 		Bosses = 0,
 		ActiveDays = 1,
 		Streak = 1,
@@ -91,6 +767,8 @@ function Model.new(now)
 		SpendDays = 0,
 		LastSpendDay = -1,
 		Wallet = { Flares = 3 },
+		Upgrades = { Strike = 0, Pulse = 0, Step = 0 },
+		QuestsPaid = {},
 		Collection = {},
 		Receipts = {},
 	}
@@ -108,6 +786,7 @@ function Model.normalize(raw, now)
 	base.Rebirths = number(raw.Rebirths, 0)
 	base.MaxZone = math.clamp(number(raw.MaxZone, 1, 1), 1, 2)
 	base.Kills = number(raw.Kills, 0)
+	base.DeepKills = number(raw.DeepKills, 0)
 	base.Bosses = number(raw.Bosses, 0)
 	base.ActiveDays = number(raw.ActiveDays, 1, 1)
 	base.Streak = number(raw.Streak, 1, 1)
@@ -120,6 +799,21 @@ function Model.normalize(raw, now)
 	base.LastSpendDay = number(raw.LastSpendDay, -1, -1)
 	base.Wallet.Flares = number(type(raw.Wallet) == "table" and raw.Wallet.Flares, 3)
 
+	-- Move ranks are capped here as well as at purchase time, so a tampered or
+	-- half-written save can never hand out a permanently overpowered ability.
+	if type(raw.Upgrades) == "table" then
+		for _, key in ABILITY_KEYS do
+			base.Upgrades[key] = math.clamp(number(raw.Upgrades[key], 0), 0, 10)
+		end
+	end
+
+	if type(raw.QuestsPaid) == "table" then
+		for questId, paid in raw.QuestsPaid do
+			if type(questId) == "string" and paid == true and #questId &lt;= 40 then
+				base.QuestsPaid[questId] = true
+			end
+		end
+	end
 	if type(raw.Collection) == "table" then
 		for key, value in raw.Collection do
 			if type(key) == "string" and value == true and #key &lt;= 40 then
@@ -160,7 +854,43 @@ function Model.rebirthCost(profile)
 end
 
 function Model.damage(profile)
-	return math.floor((8 + profile.Level * 4) * (1 + profile.Rebirths * 0.1))
+	local base = (8 + profile.Level * 4) * (1 + profile.Rebirths * 0.1)
+	return math.floor(base * Model.strikeMultiplier(profile))
+end
+
+-- Ability ranks ---------------------------------------------------------------
+-- Kept as plain arithmetic so the CLI suite can check the curves without Roblox.
+
+function Model.rank(profile, key)
+	return (profile.Upgrades and profile.Upgrades[key]) or 0
+end
+
+function Model.abilityCost(baseCost, growth, rank)
+	return math.floor(baseCost * (growth ^ rank))
+end
+
+function Model.strikeMultiplier(profile)
+	return 1 + 0.14 * Model.rank(profile, "Strike")
+end
+
+function Model.strikeKnocksBack(profile)
+	return Model.rank(profile, "Strike") &gt;= 3
+end
+
+function Model.pulseRange(profile, baseRange)
+	return baseRange + 4 * Model.rank(profile, "Pulse")
+end
+
+function Model.pulseMultiplier(profile)
+	return 1.4 * (1 + 0.12 * Model.rank(profile, "Pulse"))
+end
+
+function Model.dashCooldown(profile, baseCooldown)
+	return math.max(1.2, baseCooldown - 0.4 * Model.rank(profile, "Step"))
+end
+
+function Model.dodgeWindow(profile)
+	return 0.55 + 0.06 * Model.rank(profile, "Step")
 end
 
 function Model.applyMilestones(profile)
@@ -173,20 +903,8 @@ function Model.applyMilestones(profile)
 	if profile.ActiveDays &gt;= 20 then profile.Collection.HollowCrown = true end
 end
 
-function Model.nextGoal(profile)
-	if profile.Kills &lt; 1 then return "Defeat your first shade" end
-	if profile.Level &lt; 3 then return "Reach Soul Level 3 to unlock Pulse" end
-	if profile.MaxZone &lt; 2 then return "Gather 150 Souls and open the Ash Gate" end
-	if profile.Bosses &lt; 1 then return "Defeat the Frozen Warden" end
-	if profile.Rebirths &lt; 1 then return "Gather 500 Souls and rebirth" end
-	if profile.Kills &lt; 25 then return "Bind 25 shades into your collection" end
-	if profile.ActiveDays &lt; 7 then return `Return on {7 - profile.ActiveDays} more days for the Ember Veteran sigil` end
-	if profile.ActiveDays &lt; 20 then return `Return on {20 - profile.ActiveDays} more days for the Hollow Crown` end
-	return "Grow your rebirth rank and help a friend through the Ash Gate"
-end
-
 return Model
-</ProtectedString><string name="Name">Model</string></Properties></Item><Item class="ModuleScript" referent="RBX10"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local Receipt = {}
+</ProtectedString><string name="Name">Model</string></Properties></Item><Item class="ModuleScript" referent="RBX12"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local Receipt = {}
 
 function Receipt.apply(profile, receipt, productCatalog, now)
 	if type(profile) ~= "table" or type(receipt) ~= "table" then return false, "invalid" end
@@ -208,7 +926,7 @@ function Receipt.apply(profile, receipt, productCatalog, now)
 end
 
 return Receipt
-</ProtectedString><string name="Name">Receipt</string></Properties></Item><Item class="ModuleScript" referent="RBX11"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
+</ProtectedString><string name="Name">Receipt</string></Properties></Item><Item class="ModuleScript" referent="RBX13"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -290,7 +1008,7 @@ function Store.forget(userId)
 end
 
 return Store
-</ProtectedString><string name="Name">Store</string></Properties></Item><Item class="ModuleScript" referent="RBX12"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local MarketplaceService = game:GetService("MarketplaceService")
+</ProtectedString><string name="Name">Store</string></Properties></Item><Item class="ModuleScript" referent="RBX14"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -384,26 +1102,30 @@ end
 
 Commerce.processReceiptForTest = processReceipt
 return Commerce
-</ProtectedString><string name="Name">Commerce</string></Properties></Item><Item class="Script" referent="RBX13"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local Debris = game:GetService("Debris")
-local Lighting = game:GetService("Lighting")
+</ProtectedString><string name="Name">Commerce</string></Properties></Item><Item class="Script" referent="RBX15"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
 
 local root = ReplicatedStorage:WaitForChild("SoulGrind")
 local Config = require(root.Config)
+local Quests = require(root.Quests)
 local Model = require(script.Parent.Model)
 local Store = require(script.Parent.Store)
 local Commerce = require(script.Parent.Commerce)
+local World = require(script.Parent.World)
 
 local Action = root:WaitForChild("Action")
 local State = root:WaitForChild("State")
 local Notice = root:WaitForChild("Notice")
 local FX = root:WaitForChild("FX")
 
+local palette = Config.Palette
 local sessions = {}
 local enemies = {}
+
+local built = World.build()
+local world = built.Folder
 
 local function showNotice(player, message)
 	Notice:FireClient(player, message)
@@ -424,11 +1146,32 @@ local function updateLeaderstats(player, profile)
 	end
 end
 
+local function abilityCosts(profile)
+	local costs = {}
+	for _, def in Config.Abilities do
+		costs[def.Key] = Model.abilityCost(def.BaseCost, def.Growth, Model.rank(profile, def.Key))
+	end
+	return costs
+end
+
+-- The world signs and the HUD banner read the same active quest, so the answer to
+-- "what am I supposed to do" is identical wherever the player looks.
 local function publish(player)
 	local profile = Store.peek(player.UserId)
 	local session = sessions[player]
 	if not profile or not session then return end
 	updateLeaderstats(player, profile)
+
+	local quests = Quests.snapshot(profile)
+	local progress = {}
+	for _, row in quests.Rows do progress[row.Id] = row.Value end
+
+	if quests.Active then
+		World.setObjective(quests.Active.Title:upper(), `{quests.Active.Detail}\n\n{quests.Active.Hint}`)
+	else
+		World.setObjective("ALL CHARGES BOUND", "Every quest is complete. Rebirth again or help a friend through the Ash Gate.")
+	end
+
 	State:FireClient(player, {
 		Revision = profile.Revision,
 		Souls = profile.Souls,
@@ -436,6 +1179,7 @@ local function publish(player)
 		Rebirths = profile.Rebirths,
 		MaxZone = profile.MaxZone,
 		Kills = profile.Kills,
+		DeepKills = profile.DeepKills,
 		Bosses = profile.Bosses,
 		ActiveDays = profile.ActiveDays,
 		Streak = profile.Streak,
@@ -454,7 +1198,16 @@ local function publish(player)
 		RebirthCost = Model.rebirthCost(profile),
 		Damage = Model.damage(profile),
 		PulseUnlocked = profile.Level &gt;= 3,
-		NextGoal = Model.nextGoal(profile),
+		Upgrades = profile.Upgrades,
+		AbilityCosts = abilityCosts(profile),
+		-- Only the numbers travel; titles and hints come from the shared Quests module.
+		Quests = {
+			Progress = progress,
+			ActiveId = quests.Active and quests.Active.Id or nil,
+			Completed = quests.Completed,
+			Total = quests.Total,
+			Rate = quests.Rate,
+		},
 		DailyName = "Bind 10 shades",
 		DailyReward = Config.DailyReward,
 		Collection = profile.Collection,
@@ -471,295 +1224,47 @@ local function applyAura(player, enabled)
 	if not enabled then return end
 	local highlight = Instance.new("Highlight")
 	highlight.Name = "SoulAura"
-	highlight.FillColor = Color3.fromRGB(184, 86, 255)
-	highlight.FillTransparency = 0.55
-	highlight.OutlineColor = Color3.fromRGB(89, 224, 255)
-	highlight.OutlineTransparency = 0.1
+	highlight.FillColor = palette.CrimsonLit
+	highlight.FillTransparency = 0.6
+	highlight.OutlineColor = palette.GoldLight
+	highlight.OutlineTransparency = 0.15
 	highlight.Parent = character
 end
 
-local function makePart(parent, name, size, cframe, color, material)
-	local part = Instance.new("Part")
-	part.Name = name
-	part.Size = size
-	part.CFrame = cframe
-	part.Anchored = true
-	part.Color = color
-	part.Material = material or Enum.Material.Slate
-	part.TopSurface = Enum.SurfaceType.Smooth
-	part.BottomSurface = Enum.SurfaceType.Smooth
-	part.Parent = parent
-	return part
-end
-
-local function addLabel(part, text, color, height)
-	local billboard = Instance.new("BillboardGui")
-	billboard.Name = "WorldLabel"
-	billboard.Size = UDim2.fromOffset(300, 54)
-	billboard.StudsOffset = Vector3.new(0, height or 5, 0)
-	billboard.AlwaysOnTop = true
-	billboard.MaxDistance = 600
-	billboard.Parent = part
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.Text = text
-	label.TextColor3 = color
-	label.TextStrokeTransparency = 0.1
-	label.TextStrokeColor3 = Color3.fromRGB(6, 4, 12)
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.Parent = billboard
-end
-
-local world = Workspace:FindFirstChild("SoulGrindWorld")
-if world then world:Destroy() end
-world = Instance.new("Folder")
-world.Name = "SoulGrindWorld"
-world.Parent = Workspace
-
--- Readability first: the underworld stays violet and moody, but every surface has to
--- clear the "is that a wall or the void?" bar. Ambient light carries the shapes, the
--- low sun carries the shadows, and fog starts far enough out to leave the arena legible.
--- ClockTime is the taste knob: 5.7 is a violet pre-dawn. Lower is darker, 12 is flat noon.
--- Atmosphere and EnvironmentDiffuseScale need Lighting.Technology of ShadowMap or better,
--- which tools/build-place.mjs pins in the place file because scripts cannot set it.
-Lighting.ClockTime = 5.7
-Lighting.GeographicLatitude = 18
-Lighting.Brightness = 1.9
-Lighting.ExposureCompensation = -0.1
-Lighting.Ambient = Color3.fromRGB(58, 50, 78)
-Lighting.OutdoorAmbient = Color3.fromRGB(70, 64, 92)
-Lighting.FogColor = Color3.fromRGB(46, 32, 70)
-Lighting.FogStart = 120
-Lighting.FogEnd = 620
-Lighting.EnvironmentDiffuseScale = 0.35
-Lighting.EnvironmentSpecularScale = 0.2
-Lighting.GlobalShadows = true
-
-local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
-atmosphere.Density = 0.3
-atmosphere.Haze = 1.2
-atmosphere.Glare = 0.03
-atmosphere.Offset = 0.1
-atmosphere.Color = Color3.fromRGB(120, 100, 150)
-atmosphere.Decay = Color3.fromRGB(46, 30, 70)
-atmosphere.Parent = Lighting
-
-local function lightingEffect(className, name, properties)
-	local effect = Lighting:FindFirstChild(name) or Instance.new(className)
-	effect.Name = name
-	for property, value in properties do effect[property] = value end
-	effect.Parent = Lighting
-end
-
-lightingEffect("BloomEffect", "SoulBloom", { Intensity = 0.22, Size = 18, Threshold = 2.3 })
-lightingEffect("ColorCorrectionEffect", "UnderworldGrade", {
-	Brightness = -0.01, Contrast = 0.16, Saturation = -0.04, TintColor = Color3.fromRGB(236, 228, 252),
-})
--- Depth of field blurred the very silhouettes the player needs to read. Removed on purpose.
-local staleDepth = Lighting:FindFirstChild("SoulDepth")
-if staleDepth then staleDepth:Destroy() end
-
-local function addEmbers(parent, position, color)
-	local anchor = makePart(parent, "DriftingSouls", Vector3.new(1, 1, 1), CFrame.new(position), color, Enum.Material.Neon)
-	anchor.Transparency = 1
-	anchor.CanCollide = false
-	local emitter = Instance.new("ParticleEmitter")
-	emitter.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-	emitter.Color = ColorSequence.new(color, Color3.fromRGB(225, 221, 255))
-	emitter.LightEmission = 0.8
-	emitter.Lifetime = NumberRange.new(3.5, 6)
-	emitter.Rate = 22
-	emitter.Rotation = NumberRange.new(0, 360)
-	emitter.RotSpeed = NumberRange.new(-35, 35)
-	emitter.Speed = NumberRange.new(1.5, 4)
-	emitter.SpreadAngle = Vector2.new(180, 180)
-	emitter.Parent = anchor
-end
-
-local function addTorch(parent, position, color)
-	makePart(parent, "IronBrazier", Vector3.new(1.1, 5.2, 1.1), CFrame.new(position), Color3.fromRGB(78, 70, 92), Enum.Material.Metal)
-	makePart(parent, "BrazierBowl", Vector3.new(2.6, 0.8, 2.6), CFrame.new(position + Vector3.new(0, 2.5, 0)), Color3.fromRGB(96, 86, 110), Enum.Material.Metal)
-	local flame = makePart(parent, "SoulFlame", Vector3.new(1.7, 2.3, 1.7), CFrame.new(position + Vector3.new(0, 3.4, 0)), color, Enum.Material.Neon)
-	flame.Shape = Enum.PartType.Ball
-	flame.CanCollide = false
-	local light = Instance.new("PointLight")
-	light.Color = color
-	light.Brightness = 2.2
-	light.Range = 30
-	light.Shadows = true
-	light.Parent = flame
-	local fire = Instance.new("ParticleEmitter")
-	fire.Texture = "rbxasset://textures/particles/fire_main.dds"
-	fire.Color = ColorSequence.new(Color3.new(1, 1, 1), color)
-	fire.LightEmission = 1
-	fire.Lifetime = NumberRange.new(0.4, 0.75)
-	fire.Rate = 34
-	fire.Size = NumberSequence.new(2.2)
-	fire.Speed = NumberRange.new(2, 5)
-	fire.SpreadAngle = Vector2.new(18, 18)
-	fire.Parent = flame
-end
-
-local function addRuinedArch(parent, position, color, stone)
-	stone = stone or Color3.fromRGB(104, 94, 124)
-	makePart(parent, "ArchPillar", Vector3.new(4, 18, 5), CFrame.new(position + Vector3.new(-9, 9, 0)), stone, Enum.Material.Basalt)
-	makePart(parent, "ArchPillar", Vector3.new(4, 18, 5), CFrame.new(position + Vector3.new(9, 9, 0)), stone, Enum.Material.Basalt)
-	makePart(parent, "ArchLintel", Vector3.new(22, 4, 5), CFrame.new(position + Vector3.new(0, 18, 0)) * CFrame.Angles(0, 0, math.rad(-2)), stone, Enum.Material.Basalt)
-	for x = -1, 1, 2 do
-		local rune = makePart(parent, "ArchRune", Vector3.new(0.4, 8, 1.4), CFrame.new(position + Vector3.new(x * 9, 10, -2.7)), color, Enum.Material.Neon)
-		rune.CanCollide = false
-	end
-end
-
--- A glowing grid is the cheapest honest depth cue on a flat arena: it tells the player
--- how far away something is without lighting the whole map like a showroom.
-local function addFloorGrid(folder, zone, half)
-	for step = -6, 6 do
-		local line = makePart(folder, "SoulGrid", Vector3.new(0.5, 0.25, half.Z * 2), CFrame.new(zone.Origin + Vector3.new(step * (half.X / 6.5), 1.2, 0)), zone.Color, Enum.Material.Neon)
-		line.Transparency = 0.84
-		line.CanCollide = false
-		local cross = makePart(folder, "SoulGrid", Vector3.new(half.X * 2, 0.25, 0.5), CFrame.new(zone.Origin + Vector3.new(0, 1.2, step * (half.Z / 6.5))), zone.Color, Enum.Material.Neon)
-		cross.Transparency = 0.9
-		cross.CanCollide = false
-	end
-	for side = -1, 1, 2 do
-		local edgeX = makePart(folder, "ArenaEdge", Vector3.new(1.2, 0.7, half.Z * 2), CFrame.new(zone.Origin + Vector3.new(side * half.X, 1.4, 0)), zone.Color, Enum.Material.Neon)
-		edgeX.CanCollide = false
-		edgeX.Transparency = 0.4
-		local edgeZ = makePart(folder, "ArenaEdge", Vector3.new(half.X * 2, 0.7, 1.2), CFrame.new(zone.Origin + Vector3.new(0, 1.4, side * half.Z)), zone.Color, Enum.Material.Neon)
-		edgeZ.CanCollide = false
-		edgeZ.Transparency = 0.4
-	end
-end
-
--- The obelisk is the zone's landmark. It is tall enough to see from anywhere in the
--- arena, so the player always knows which way is "back to the middle".
-local function addObelisk(folder, zone)
-	local base = zone.Origin + Vector3.new(0, 1.1, 0)
-	-- Non-collidable on purpose. Enemies steer with Humanoid:MoveTo, which has no
-	-- pathfinding, so a solid pillar in the middle of the arena is a trap, not cover.
-	local plinth = makePart(folder, "ObeliskBase", Vector3.new(14, 1.2, 14), CFrame.new(base + Vector3.new(0, 0.6, 0)), zone.Stone, Enum.Material.Marble)
-	plinth.CanCollide = false
-	local shaft = makePart(folder, "ObeliskShaft", Vector3.new(6, 46, 6), CFrame.new(base + Vector3.new(0, 24, 0)), Color3.fromRGB(88, 78, 108), Enum.Material.Basalt)
-	shaft.CanCollide = false
-	local core = makePart(folder, "ObeliskCore", Vector3.new(2.2, 40, 2.2), CFrame.new(base + Vector3.new(0, 24, -3.1)), zone.Color, Enum.Material.Neon)
-	core.CanCollide = false
-	local crown = makePart(folder, "ObeliskCrown", Vector3.new(4.4, 4.4, 4.4), CFrame.new(base + Vector3.new(0, 49, 0)), zone.Color, Enum.Material.Neon)
-	crown.Shape = Enum.PartType.Ball
-	crown.CanCollide = false
-	local light = Instance.new("PointLight")
-	light.Color = zone.Color
-	light.Brightness = 3
-	light.Range = 45
-	light.Parent = crown
-	return crown
-end
-
-local function buildZone(zoneId, zone)
-	local folder = Instance.new("Folder")
-	folder.Name = zone.Name:gsub(" ", "")
-	folder.Parent = world
-	local half = Vector3.new(73, 0, 53)
-
-	makePart(folder, "Bedrock", Vector3.new(154, 7, 114), CFrame.new(zone.Origin - Vector3.new(0, 3.8, 0)), Color3.fromRGB(40, 34, 54), Enum.Material.Basalt)
-	makePart(folder, "ArenaFloor", Vector3.new(146, 2.2, 106), CFrame.new(zone.Origin), zone.Ground, Enum.Material.Slate)
-
-	-- Lighter inlay slabs break the floor into readable bands instead of one dark sheet.
-	for band = -2, 2 do
-		local slab = makePart(folder, "FloorInlay", Vector3.new(146, 0.4, 9), CFrame.new(zone.Origin + Vector3.new(0, 1.1, band * 22)), zone.GroundAlt, Enum.Material.Concrete)
-		slab.CanCollide = false
-	end
-	addFloorGrid(folder, zone, half)
-
-	for step = -5, 5 do
-		if step == 0 then continue end
-		local offset = Vector3.new((step % 2) * 0.8, 1.45, step * 8)
-		makePart(folder, "PilgrimStone", Vector3.new(15, 0.65, 7), CFrame.new(zone.Origin + offset) * CFrame.Angles(0, math.rad(step * 2), 0), zone.Stone, Enum.Material.Cobblestone)
-	end
-
-	for side = -1, 1, 2 do
-		for index = -2, 2 do
-			local position = zone.Origin + Vector3.new(side * (57 + index % 2 * 5), 6 + (index % 2) * 2, index * 21)
-			local cliff = makePart(folder, "BrokenCliff", Vector3.new(18, 14 + (index % 2) * 4, 17), CFrame.new(position) * CFrame.Angles(math.rad(index * 3), math.rad(index * 13), math.rad(side * 5)), Color3.fromRGB(60, 52, 76), Enum.Material.Basalt)
-			local vein = makePart(folder, "CliffVein", Vector3.new(0.6, cliff.Size.Y * 0.7, 1), cliff.CFrame * CFrame.new(0, 0, -8.6), zone.Color, Enum.Material.Neon)
-			vein.CanCollide = false
-			vein.Transparency = 0.2
+-- Quest rewards commit inside the same profile write that produced the progress, so a
+-- reward can never be granted twice or granted without the progress that earned it.
+local function settleQuests(profile, awarded)
+	local snapshot = Quests.snapshot(profile)
+	for _, row in snapshot.Rows do
+		if row.Done and not profile.QuestsPaid[row.Id] then
+			profile.QuestsPaid[row.Id] = true
+			profile.Souls += row.Reward
+			table.insert(awarded, row)
 		end
 	end
-
-	for index = 1, 12 do
-		local angle = index * math.pi * 2 / 12 + zoneId * 0.23
-		local radius = 39 + (index % 3) * 9
-		local position = zone.Origin + Vector3.new(math.cos(angle) * radius, 4.4, math.sin(angle) * radius)
-		local shard = makePart(folder, "SoulShard", Vector3.new(1.6 + index % 2, 7 + index % 5, 1.6 + index % 2), CFrame.new(position) * CFrame.Angles(math.rad(index * 4), 0, math.rad(index % 2 == 0 and 14 or -17)), zone.Color, Enum.Material.Neon)
-		shard.Transparency = 0.25
-		shard.CanCollide = false
-	end
-
-	for _, offset in { Vector3.new(-24, 0, 31), Vector3.new(24, 0, 31), Vector3.new(-31, 0, -27), Vector3.new(31, 0, -27), Vector3.new(-44, 0, 3), Vector3.new(44, 0, 3) } do
-		addTorch(folder, zone.Origin + offset + Vector3.new(0, 3.8, 0), zone.Color)
-	end
-	addRuinedArch(folder, zone.Origin + Vector3.new(0, 1.2, -47), zone.Color, zone.Stone)
-	addEmbers(folder, zone.Origin + Vector3.new(0, 14, 0), zone.Color)
-
-	local crown = addObelisk(folder, zone)
-	addLabel(crown, zone.Name:upper(), zone.Color, 8)
 end
 
-for zoneId, zone in Config.Zones do buildZone(zoneId, zone) end
-
-local spawn = Instance.new("SpawnLocation")
-spawn.Name = "UnderworldSpawn"
-spawn.Size = Vector3.new(11, 0.8, 11)
-spawn.CFrame = CFrame.new(Config.Zones[1].Origin + Vector3.new(0, 2, 38))
-spawn.Anchored = true
-spawn.Neutral = true
-spawn.Color = Color3.fromRGB(148, 132, 176)
-spawn.Material = Enum.Material.Marble
-spawn.Transparency = 0
-spawn.Parent = world
-local spawnRune = makePart(world, "SpawnRune", Vector3.new(0.25, 15, 15), spawn.CFrame * CFrame.Angles(0, 0, math.rad(90)), Config.Zones[1].Color, Enum.Material.Neon)
-spawnRune.Shape = Enum.PartType.Cylinder
-spawnRune.Size = Vector3.new(0.3, 13, 13)
-spawnRune.Transparency = 0.45
-spawnRune.CanCollide = false
-local spawnGlow = Instance.new("PointLight")
-spawnGlow.Color = Config.Zones[1].Color
-spawnGlow.Brightness = 2
-spawnGlow.Range = 30
-spawnGlow.Parent = spawnRune
-
-local function makePortal(name, position, color, title, objectText)
-	addRuinedArch(world, position - Vector3.new(0, 9, 0), color)
-	local portal = makePart(world, name, Vector3.new(14, 14, 0.8), CFrame.new(position), color, Enum.Material.ForceField)
-	portal.Transparency = 0.2
-	portal.CanCollide = false
-	local beacon = makePart(world, "PortalBeacon", Vector3.new(1.6, 150, 1.6), CFrame.new(position + Vector3.new(0, 70, 0)), color, Enum.Material.Neon)
-	beacon.Transparency = 0.55
-	beacon.CanCollide = false
-	local portalLight = Instance.new("PointLight")
-	portalLight.Color = color
-	portalLight.Brightness = 3
-	portalLight.Range = 40
-	portalLight.Parent = portal
-	addLabel(portal, title, Color3.new(1, 1, 1))
-	local prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText = "Open / Cross"
-	prompt.ObjectText = objectText
-	prompt.HoldDuration = 0.35
-	prompt.MaxActivationDistance = 13
-	prompt.RequiresLineOfSight = false
-	prompt.Parent = portal
-	addEmbers(world, position, color)
-	return prompt
+local function mutate(player, transform)
+	local awarded = {}
+	local success, profile = Store.update(player.UserId, function(current)
+		-- UpdateAsync may run this more than once; never let an award list accumulate.
+		table.clear(awarded)
+		transform(current)
+		Model.applyMilestones(current)
+		settleQuests(current, awarded)
+		return current
+	end)
+	if success then
+		publish(player)
+		for _, row in awarded do
+			showNotice(player, `QUEST COMPLETE — {row.Title}   +{row.Reward} Souls`)
+			FX:FireClient(player, { Kind = "Quest", Title = row.Title, Reward = row.Reward })
+		end
+	else
+		showNotice(player, "The Underworld could not save that action. Try again.")
+	end
+	return success, profile
 end
-
-local gatePrompt = makePortal("AshGate", Vector3.new(68, 10, 0), Color3.fromRGB(197, 93, 255), "ASH GATE\n150 SOULS", "Frozen Purgatory")
-local returnPrompt = makePortal("ReturnGate", Vector3.new(152, 10, 0), Color3.fromRGB(75, 216, 255), "RETURN TO CINDER HOLLOW", "Cinder Hollow")
-returnPrompt.ActionText = "Return"
-returnPrompt.HoldDuration = 0.2
 
 local function teleportToZone(player, zoneId)
 	local profile = Store.peek(player.UserId)
@@ -767,21 +1272,9 @@ local function teleportToZone(player, zoneId)
 	if not profile or not session or zoneId &lt; 1 or zoneId &gt; profile.MaxZone then return false end
 	session.Zone = zoneId
 	local character = player.Character
-	if character then
-		character:PivotTo(CFrame.new(Config.Zones[zoneId].Origin + Vector3.new(0, 6, 38)))
-	end
+	if character then character:PivotTo(World.arrivalCFrame(zoneId)) end
 	publish(player)
 	return true
-end
-
-local function mutate(player, transform)
-	local success, profile = Store.update(player.UserId, function(current)
-		transform(current)
-		Model.applyMilestones(current)
-		return current
-	end)
-	if success then publish(player) else showNotice(player, "The Underworld could not save that action. Try again.") end
-	return success, profile
 end
 
 local function unlockZone(player)
@@ -801,47 +1294,44 @@ local function unlockZone(player)
 	end)
 	if not success then return end
 	if outcome == "poor" then
-		showNotice(player, "The Ash Gate needs 150 Souls.")
+		local profile = Store.peek(player.UserId)
+		showNotice(player, `The Ash Gate needs 150 Souls. You hold {profile and profile.Souls or 0}.`)
 	else
-		if outcome == "unlocked" then showNotice(player, "Frozen Purgatory is now permanently open.") end
+		if outcome == "unlocked" then showNotice(player, "The Ash Gate is open. The Molten Reliquary lies beyond.") end
 		teleportToZone(player, 2)
 	end
 end
 
-gatePrompt.Triggered:Connect(function(player)
-	unlockZone(player)
-end)
-returnPrompt.Triggered:Connect(function(player)
+built.GatePrompt.Triggered:Connect(unlockZone)
+built.ReturnPrompt.Triggered:Connect(function(player)
 	teleportToZone(player, 1)
 end)
 
--- Y sits on the arena floor (top face at 1.1) so nothing spawns mid-air or half-buried.
-local FLOOR_Y = 1.1
-local enemyOffsets = {
-	Vector3.new(0, FLOOR_Y, 22), Vector3.new(-22, FLOOR_Y, -14), Vector3.new(20, FLOOR_Y, 6),
-	Vector3.new(34, FLOOR_Y, -24), Vector3.new(-6, FLOOR_Y, -34),
-}
+-- Enemies -------------------------------------------------------------------
+-- Bodies are mid-tone on purpose: not black silhouettes, not glowing. They read
+-- against the lit floor by contrast and hue, and only the player's current target
+-- gets an outline, drawn client-side.
 
--- Body and Trim are readability, not decoration: each archetype has to be identifiable
--- by colour alone at 40 studs on a dark floor, before any name plate is readable.
 local archetypes = {
 	Shade = {
 		Name = "CINDER SHADE", Health = 1, Damage = 1, Speed = 11, Reward = 1, Range = 5, Cooldown = 1.15,
-		Body = Color3.fromRGB(126, 92, 184), Trim = Color3.fromRGB(216, 146, 255),
+		Body = Color3.fromRGB(142, 116, 116), Trim = Color3.fromRGB(217, 82, 74),
 	},
 	Reaver = {
 		Name = "BONE REAVER", Health = 1.75, Damage = 1.35, Speed = 8, Reward = 1.65, Range = 6, Cooldown = 1.55,
-		Body = Color3.fromRGB(162, 126, 96), Trim = Color3.fromRGB(255, 158, 78),
+		Body = Color3.fromRGB(156, 112, 78), Trim = Color3.fromRGB(224, 138, 60),
 	},
 	Wisp = {
-		Name = "SOUL WISP", Health = 0.7, Damage = 0.8, Speed = 14, Reward = 1.25, Range = 4.5, Cooldown = 0.9,
-		Body = Color3.fromRGB(88, 176, 206), Trim = Color3.fromRGB(150, 236, 252),
+		Name = "ASH WISP", Health = 0.7, Damage = 0.8, Speed = 14, Reward = 1.25, Range = 4.5, Cooldown = 0.9,
+		Body = Color3.fromRGB(186, 168, 126), Trim = Color3.fromRGB(255, 233, 168),
 	},
 	Warden = {
-		Name = "FROZEN WARDEN", Health = 4.5, Damage = 1.55, Speed = 7, Reward = 5, Range = 7, Cooldown = 1.4,
-		Body = Color3.fromRGB(158, 188, 214), Trim = Color3.fromRGB(96, 222, 250),
+		Name = "GILDED WARDEN", Health = 4.5, Damage = 1.55, Speed = 7, Reward = 5, Range = 7, Cooldown = 1.4,
+		Body = Color3.fromRGB(170, 86, 74), Trim = Color3.fromRGB(201, 162, 74),
 	},
 }
+
+local postOrder = { "Shade", "Shade", "Wisp", "Reaver", "Shade", "Wisp", "Reaver", "Reaver", "Shade" }
 
 local function enemyPart(model, rootPart, name, size, offset, color, material, shape, transparency)
 	local part = Instance.new("Part")
@@ -872,27 +1362,30 @@ local function addEnemyBar(rootPart, humanoid, title, color, height)
 	gui.AlwaysOnTop = true
 	gui.MaxDistance = 190
 	gui.Parent = rootPart
+
 	local label = Instance.new("TextLabel")
 	label.Name = "Title"
 	label.Size = UDim2.new(1, 0, 0, 22)
 	label.BackgroundTransparency = 1
 	label.Text = title
-	label.TextColor3 = Color3.fromRGB(246, 242, 255)
+	label.TextColor3 = Color3.fromRGB(246, 236, 222)
 	label.TextStrokeTransparency = 0
-	label.TextStrokeColor3 = Color3.fromRGB(6, 4, 12)
+	label.TextStrokeColor3 = Color3.fromRGB(12, 6, 8)
 	label.Font = Enum.Font.GothamBold
 	label.TextSize = 14
 	label.Parent = gui
+
 	local back = Instance.new("Frame")
 	back.Name = "Back"
 	back.Size = UDim2.new(1, -20, 0, 9)
 	back.Position = UDim2.fromOffset(10, 27)
-	back.BackgroundColor3 = Color3.fromRGB(14, 11, 20)
+	back.BackgroundColor3 = Color3.fromRGB(18, 10, 12)
 	back.BorderSizePixel = 0
 	back.Parent = gui
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(1, 0)
 	corner.Parent = back
+
 	local fill = Instance.new("Frame")
 	fill.Name = "Fill"
 	fill.Size = UDim2.fromScale(1, 1)
@@ -901,32 +1394,36 @@ local function addEnemyBar(rootPart, humanoid, title, color, height)
 	fill.Parent = back
 	local fillCorner = corner:Clone()
 	fillCorner.Parent = fill
+
 	humanoid.HealthChanged:Connect(function(health)
 		fill.Size = UDim2.fromScale(math.clamp(health / humanoid.MaxHealth, 0, 1), 1)
 	end)
+	return label
 end
 
-local function spawnEnemy(zoneId, spawnIndex)
+local function spawnEnemy(zoneId, postIndex)
 	local zone = Config.Zones[zoneId]
-	local boss = zoneId == 2 and spawnIndex == 5
-	local kind = boss and "Warden" or ({ "Shade", "Reaver", "Wisp", "Shade", "Reaver" })[spawnIndex]
+	local boss = zoneId == 2 and postIndex == 9
+	local kind = boss and "Warden" or postOrder[postIndex]
 	local archetype = archetypes[kind]
+	local home = World.posts(zoneId)[postIndex]
+
 	local model = Instance.new("Model")
 	model.Name = kind
 	model:SetAttribute("Enemy", true)
 	model:SetAttribute("Archetype", kind)
 	model:SetAttribute("Zone", zoneId)
 	model:SetAttribute("Boss", boss)
-	model:SetAttribute("SpawnIndex", spawnIndex)
+	model:SetAttribute("PostIndex", postIndex)
+	model:SetAttribute("Home", home)
+	model:SetAttribute("State", "Idle")
 	model:SetAttribute("AttackDamage", math.floor(zone.EnemyDamage * archetype.Damage))
 	model:SetAttribute("AttackRange", archetype.Range)
 	model:SetAttribute("AttackCooldown", archetype.Cooldown)
 	model:SetAttribute("SoulReward", math.floor(zone.SoulReward * archetype.Reward))
 
-	local bodySize = boss and Vector3.new(5.2, 6.4, 4.2) or (kind == "Reaver" and Vector3.new(3.7, 4.8, 3.2) or Vector3.new(2.9, 4, 2.4))
+	local bodySize = boss and Vector3.new(5.4, 6.6, 4.4) or (kind == "Reaver" and Vector3.new(3.7, 4.8, 3.2) or Vector3.new(2.9, 4, 2.4))
 
-	-- The root is the only collider and it matches the body, so the Humanoid stands at
-	-- the right height instead of scraping half-sunk through the floor.
 	local rootPart = Instance.new("Part")
 	rootPart.Name = "HumanoidRootPart"
 	rootPart.Size = bodySize
@@ -934,49 +1431,36 @@ local function spawnEnemy(zoneId, spawnIndex)
 	rootPart.CanCollide = true
 	rootPart.TopSurface = Enum.SurfaceType.Smooth
 	rootPart.BottomSurface = Enum.SurfaceType.Smooth
-	rootPart.CFrame = CFrame.new(zone.Origin + enemyOffsets[spawnIndex] + Vector3.new(0, bodySize.Y / 2, 0))
+	rootPart.CFrame = CFrame.new(home + Vector3.new(0, bodySize.Y / 2, 0))
 	rootPart.Parent = model
 
-	local armor = archetype.Body
-	local trim = archetype.Trim
-	local bone = Color3.fromRGB(226, 220, 238)
-	enemyPart(model, rootPart, "Torso", bodySize, CFrame.new(), armor, boss and Enum.Material.Metal or Enum.Material.SmoothPlastic, kind == "Wisp" and Enum.PartType.Ball or Enum.PartType.Block)
-	local headHeight = boss and 4.5 or (kind == "Reaver" and 3.4 or 2.9)
-	enemyPart(model, rootPart, "Head", boss and Vector3.new(3.1, 3.1, 3.1) or Vector3.new(2, 2, 2), CFrame.new(0, headHeight, 0), armor, Enum.Material.SmoothPlastic, Enum.PartType.Ball)
-	local core = enemyPart(model, rootPart, "SoulCore", boss and Vector3.new(2.1, 2.1, 0.45) or Vector3.new(1.25, 1.25, 0.35), CFrame.new(0, 0.2, -bodySize.Z / 2 - 0.2), trim, Enum.Material.Neon, Enum.PartType.Ball)
-	enemyPart(model, rootPart, "Eye", boss and Vector3.new(1.3, 0.38, 0.28) or Vector3.new(0.9, 0.25, 0.2), CFrame.new(0, headHeight + 0.15, -1), trim, Enum.Material.Neon)
-	-- A bright collar reads as a silhouette edge even when the enemy is backlit.
-	enemyPart(model, rootPart, "Collar", Vector3.new(bodySize.X + 0.5, 0.4, bodySize.Z + 0.5), CFrame.new(0, bodySize.Y / 2 - 0.3, 0), trim, Enum.Material.Neon)
+	local armor, trim = archetype.Body, archetype.Trim
+	enemyPart(model, rootPart, "Torso", bodySize, CFrame.new(), armor, Enum.Material.Slate, kind == "Wisp" and Enum.PartType.Ball or Enum.PartType.Block)
+	local headHeight = boss and 4.6 or (kind == "Reaver" and 3.4 or 2.9)
+	enemyPart(model, rootPart, "Head", boss and Vector3.new(3.1, 3.1, 3.1) or Vector3.new(2, 2, 2), CFrame.new(0, headHeight, 0), armor, Enum.Material.Slate, Enum.PartType.Ball)
+	-- Eyes and a small chest ember are the only bright pixels on an enemy.
+	enemyPart(model, rootPart, "Eye", boss and Vector3.new(1.4, 0.4, 0.3) or Vector3.new(0.95, 0.26, 0.22), CFrame.new(0, headHeight + 0.15, -1), trim, Enum.Material.Neon)
+	local core = enemyPart(model, rootPart, "SoulCore", boss and Vector3.new(1.5, 1.5, 0.4) or Vector3.new(0.85, 0.85, 0.3), CFrame.new(0, 0.2, -bodySize.Z / 2 - 0.15), trim, Enum.Material.Neon, Enum.PartType.Ball)
+	enemyPart(model, rootPart, "Girdle", Vector3.new(bodySize.X + 0.3, 0.7, bodySize.Z + 0.3), CFrame.new(0, -bodySize.Y * 0.18, 0), palette.Iron, Enum.Material.Metal)
 
 	if kind == "Wisp" then
-		enemyPart(model, rootPart, "Tail", Vector3.new(1.4, 3.3, 1.4), CFrame.new(0, -2.6, 0) * CFrame.Angles(0, 0, math.rad(45)), trim, Enum.Material.Neon, Enum.PartType.Ball, 0.28)
+		enemyPart(model, rootPart, "Tail", Vector3.new(1.4, 3.3, 1.4), CFrame.new(0, -2.6, 0) * CFrame.Angles(0, 0, math.rad(45)), armor, Enum.Material.Slate, Enum.PartType.Ball, 0.35)
 	else
 		for side = -1, 1, 2 do
-			local armSize = boss and Vector3.new(1.5, 5.3, 1.5) or Vector3.new(1, kind == "Reaver" and 4.2 or 3.5, 1)
-			enemyPart(model, rootPart, "Arm", armSize, CFrame.new(side * (bodySize.X / 2 + 0.7), 0, 0) * CFrame.Angles(0, 0, math.rad(side * -9)), armor, Enum.Material.SmoothPlastic)
+			local armSize = boss and Vector3.new(1.6, 5.4, 1.6) or Vector3.new(1, kind == "Reaver" and 4.2 or 3.5, 1)
+			enemyPart(model, rootPart, "Arm", armSize, CFrame.new(side * (bodySize.X / 2 + 0.7), 0, 0) * CFrame.Angles(0, 0, math.rad(side * -9)), armor, Enum.Material.Slate)
 			if boss or kind == "Reaver" then
-				enemyPart(model, rootPart, "Horn", Vector3.new(0.65, boss and 3.7 or 2.6, 0.65), CFrame.new(side * 1.15, headHeight + 1.7, 0) * CFrame.Angles(0, 0, math.rad(side * -24)), bone, Enum.Material.Marble)
+				enemyPart(model, rootPart, "Horn", Vector3.new(0.7, boss and 3.8 or 2.6, 0.7), CFrame.new(side * 1.2, headHeight + 1.7, 0) * CFrame.Angles(0, 0, math.rad(side * -24)), boss and palette.Gold or palette.Bone, Enum.Material.Metal)
 			end
 		end
 	end
 
-	-- The single biggest readability win: an always-visible rim so an enemy never
-	-- disappears into the floor, a cliff, or the fog.
-	local outline = Instance.new("Highlight")
-	outline.Name = "SoulOutline"
-	outline.FillColor = trim
-	outline.FillTransparency = 0.9
-	outline.OutlineColor = trim
-	outline.OutlineTransparency = 0.05
-	outline.DepthMode = Enum.HighlightDepthMode.Occluded
-	outline.Parent = model
-
-	local light = Instance.new("PointLight")
-	light.Color = trim
-	light.Range = boss and 26 or 14
-	light.Brightness = boss and 2.6 or 1.6
-	light.Shadows = false
-	light.Parent = core
+	local glow = Instance.new("PointLight")
+	glow.Color = trim
+	glow.Brightness = boss and 1.4 or 0.7
+	glow.Range = boss and 16 or 9
+	glow.Shadows = false
+	glow.Parent = core
 
 	local humanoid = Instance.new("Humanoid")
 	humanoid.RequiresNeck = false
@@ -990,12 +1474,14 @@ local function spawnEnemy(zoneId, spawnIndex)
 	model.PrimaryPart = rootPart
 	model.Parent = world
 	pcall(rootPart.SetNetworkOwner, rootPart, nil)
-	addEnemyBar(rootPart, humanoid, archetype.Name, trim, bodySize.Y / 2 + (boss and 5.5 or 3.6))
-	enemies[model] = true
+
+	local titleLabel = addEnemyBar(rootPart, humanoid, archetype.Name, trim, bodySize.Y / 2 + (boss and 5.5 or 3.6))
+	model:SetAttribute("BaseSpeed", archetype.Speed)
+	enemies[model] = { Title = titleLabel, Name = archetype.Name }
 
 	humanoid.Died:Connect(function()
 		enemies[model] = nil
-		FX:FireAllClients({ Kind = "Death", Position = rootPart.Position, Color = zone.Color, Boss = boss })
+		FX:FireAllClients({ Kind = "Death", Position = rootPart.Position, Color = trim, Boss = boss })
 		local userId = model:GetAttribute("LastHitUserId")
 		local player = type(userId) == "number" and Players:GetPlayerByUserId(userId) or nil
 		if player and os.clock() - (model:GetAttribute("LastHitAt") or 0) &lt;= 12 then
@@ -1005,20 +1491,23 @@ local function spawnEnemy(zoneId, spawnIndex)
 				profile.Souls += reward
 				profile.Kills += 1
 				profile.DailyKills += 1
+				if zoneId == 2 then profile.DeepKills += 1 end
 				if boss then profile.Bosses += 1 end
 			end)
-			if granted then showNotice(player, `+{reward} Souls{boss and "  •  Warden bound!" or ""}`) end
+			if granted then showNotice(player, `+{reward} Souls{boss and "   •   The Warden falls." or ""}`) end
 		end
 		Debris:AddItem(model, 1.4)
-		task.delay(boss and 10 or 4.5, function()
-			if world.Parent then spawnEnemy(zoneId, spawnIndex) end
+		task.delay(boss and 14 or 6, function()
+			if world.Parent then spawnEnemy(zoneId, postIndex) end
 		end)
 	end)
 end
 
 for zoneId in Config.Zones do
-	for spawnIndex = 1, #enemyOffsets do spawnEnemy(zoneId, spawnIndex) end
+	for postIndex = 1, #postOrder do spawnEnemy(zoneId, postIndex) end
 end
+
+-- Combat --------------------------------------------------------------------
 
 local function nearestEnemy(player, radius)
 	local session = sessions[player]
@@ -1039,19 +1528,34 @@ local function nearestEnemy(player, radius)
 	return best, bestDistance
 end
 
+-- Being hit wakes an enemy regardless of range, so a ranged opener cannot be used to
+-- whittle something down from outside its aggro radius.
+local function alert(enemy, player)
+	if enemy:GetAttribute("State") ~= "Chasing" then
+		enemy:SetAttribute("State", "Chasing")
+		local entry = enemies[enemy]
+		if entry then entry.Title.Text = `! {entry.Name}` end
+	end
+	enemy:SetAttribute("Target", player.UserId)
+end
+
 local function hitEnemy(player, enemy, damage, combo)
 	local humanoid = enemy and enemy:FindFirstChildOfClass("Humanoid")
 	if not humanoid or humanoid.Health &lt;= 0 then return end
 	enemy:SetAttribute("LastHitUserId", player.UserId)
 	enemy:SetAttribute("LastHitAt", os.clock())
+	alert(enemy, player)
+
 	local flash = Instance.new("Highlight")
 	flash.Name = "HitFlash"
-	flash.FillColor = Color3.new(1, 1, 1)
-	flash.FillTransparency = 0.18
-	flash.OutlineTransparency = 1
+	flash.FillColor = palette.GoldPale
+	flash.FillTransparency = 0.25
+	flash.OutlineColor = palette.GoldPale
+	flash.OutlineTransparency = 0.3
 	flash.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
 	flash.Parent = enemy
 	Debris:AddItem(flash, 0.1)
+
 	humanoid:TakeDamage(damage)
 	FX:FireClient(player, { Kind = "Hit", Position = enemy.PrimaryPart.Position, Damage = damage, Combo = combo or 0 })
 end
@@ -1097,9 +1601,19 @@ local function attack(player)
 
 	local multiplier = ({ 1, 1.15, 1.7 })[session.Combo]
 	hitEnemy(player, enemy, math.floor(Model.damage(profile) * multiplier), session.Combo)
+
 	if session.Combo == 3 and enemy.PrimaryPart then
 		local direction = enemy.PrimaryPart.Position - characterRoot.Position
-		if direction.Magnitude &gt; 0 then enemy.PrimaryPart.AssemblyLinearVelocity += direction.Unit * 22 + Vector3.new(0, 8, 0) end
+		if direction.Magnitude &gt; 0 then enemy.PrimaryPart.AssemblyLinearVelocity += direction.Unit * 24 + Vector3.new(0, 8, 0) end
+		-- Strike rank 3 turns the finisher into a small shockwave.
+		if Model.strikeKnocksBack(profile) then
+			for other in enemies do
+				if other ~= enemy and other.PrimaryPart and other:GetAttribute("Zone") == session.Zone
+					and (other.PrimaryPart.Position - characterRoot.Position).Magnitude &lt;= 16 then
+					hitEnemy(player, other, math.floor(Model.damage(profile) * 0.6), 0)
+				end
+			end
+		end
 	end
 	return distance
 end
@@ -1126,24 +1640,31 @@ local function pulse(player)
 		showNotice(player, "Your body is still reforming.")
 		return
 	end
+
 	session.NextPulse = os.clock() + Config.Cooldowns.Pulse
+	local radius = Model.pulseRange(profile, Config.PulseRange)
 	local struck = 0
 	for enemy in enemies do
 		local humanoid = enemy:FindFirstChildOfClass("Humanoid")
 		if enemy.PrimaryPart and humanoid and humanoid.Health &gt; 0 and enemy:GetAttribute("Zone") == session.Zone
-			and (enemy.PrimaryPart.Position - playerRoot.Position).Magnitude &lt;= Config.PulseRange then
-			hitEnemy(player, enemy, math.floor(Model.damage(profile) * 1.4), 0)
+			and (enemy.PrimaryPart.Position - playerRoot.Position).Magnitude &lt;= radius then
+			hitEnemy(player, enemy, math.floor(Model.damage(profile) * Model.pulseMultiplier(profile)), 0)
 			struck += 1
 		end
 	end
-	FX:FireClient(player, { Kind = "Pulse", Position = playerRoot.Position, Hits = struck, Cooldown = Config.Cooldowns.Pulse })
+	FX:FireClient(player, { Kind = "Pulse", Position = playerRoot.Position, Hits = struck, Cooldown = Config.Cooldowns.Pulse, Radius = radius })
 	showNotice(player, struck &gt; 0 and `Soul Pulse struck {struck}.` or "Soul Pulse found nothing in range.")
-	local pulsePart = makePart(world, "SoulPulse", Vector3.new(1, 1, 1), CFrame.new(playerRoot.Position), Color3.fromRGB(185, 85, 255), Enum.Material.Neon)
-	pulsePart.Shape = Enum.PartType.Ball
-	pulsePart.CanCollide = false
+
+	local wave = World.makePart(world, "SoulPulse", Vector3.new(1, 1, 1), CFrame.new(playerRoot.Position), palette.CrimsonLit, Enum.Material.Neon)
+	wave.Shape = Enum.PartType.Ball
+	wave.CanCollide = false
 	task.spawn(function()
-		for size = 2, Config.PulseRange * 2, 4 do pulsePart.Size = Vector3.new(size, size, size); pulsePart.Transparency = 0.25 + size / (Config.PulseRange * 2.8); task.wait(0.025) end
-		pulsePart:Destroy()
+		for size = 2, radius * 2, 4 do
+			wave.Size = Vector3.new(size, size, size)
+			wave.Transparency = 0.3 + size / (radius * 2.8)
+			task.wait(0.025)
+		end
+		wave:Destroy()
 	end)
 end
 
@@ -1162,11 +1683,14 @@ local function dash(player)
 		showNotice(player, `Soul Step recharges in {math.ceil(session.NextDash - now)}s.`)
 		return
 	end
-	session.NextDash = now + Config.Cooldowns.Dash
-	session.DodgeUntil = now + 0.55
+
+	local profile = Store.peek(player.UserId)
+	local cooldown = profile and Model.dashCooldown(profile, Config.Cooldowns.Dash) or Config.Cooldowns.Dash
+	session.NextDash = now + cooldown
+	session.DodgeUntil = now + (profile and Model.dodgeWindow(profile) or 0.55)
 	session.Combo = 0
-	playerRoot.AssemblyLinearVelocity = playerRoot.CFrame.LookVector * 72 + Vector3.new(0, 5, 0)
-	FX:FireAllClients({ Kind = "Dash", Player = player, Cooldown = Config.Cooldowns.Dash })
+	playerRoot.AssemblyLinearVelocity = playerRoot.CFrame.LookVector * 74 + Vector3.new(0, 5, 0)
+	FX:FireAllClients({ Kind = "Dash", Player = player, Cooldown = cooldown })
 end
 
 local function useFlare(player)
@@ -1192,7 +1716,7 @@ local function useFlare(player)
 	end
 	local emitter = Instance.new("ParticleEmitter")
 	emitter.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-	emitter.Color = ColorSequence.new(Color3.fromRGB(174, 67, 255), Color3.fromRGB(70, 230, 255))
+	emitter.Color = ColorSequence.new(palette.GoldPale, palette.CrimsonLit)
 	emitter.Lifetime = NumberRange.new(1.2, 2)
 	emitter.Speed = NumberRange.new(12, 24)
 	emitter.SpreadAngle = Vector2.new(180, 180)
@@ -1203,7 +1727,7 @@ local function useFlare(player)
 end
 
 local function refreshFriends()
-	for player, session in sessions do session.FriendBonus = false end
+	for _, session in sessions do session.FriendBonus = false end
 	local currentPlayers = Players:GetPlayers()
 	-- ponytail: quadratic only when players join/leave; cache friend pairs if server size grows.
 	for i = 1, #currentPlayers do
@@ -1219,11 +1743,53 @@ local function refreshFriends()
 end
 
 local allowedActions = {
-	Sync = true, Attack = true, Pulse = true, Dash = true, Upgrade = true, UnlockZone = true,
-	Travel = true, Rebirth = true, ClaimDaily = true, Flare = true, Aura = true,
+	Sync = true, Attack = true, Pulse = true, Dash = true, Upgrade = true, UpgradeMove = true,
+	UnlockZone = true, Travel = true, Rebirth = true, ClaimDaily = true, Flare = true, Aura = true,
 }
 
 Commerce.init(Store, publish, showNotice, applyAura)
+
+local function upgradeMove(player, key)
+	local def
+	for _, entry in Config.Abilities do
+		if entry.Key == key then def = entry end
+	end
+	if not def then return end
+
+	local outcome, cost
+	local success = mutate(player, function(profile)
+		local rank = Model.rank(profile, def.Key)
+		if profile.Level &lt; def.RequiresLevel then
+			outcome = "locked"
+			return
+		end
+		if rank &gt;= def.Max then
+			outcome = "max"
+			return
+		end
+		cost = Model.abilityCost(def.BaseCost, def.Growth, rank)
+		if profile.Souls &lt; cost then
+			outcome = "poor"
+			return
+		end
+		profile.Souls -= cost
+		profile.Upgrades[def.Key] = rank + 1
+		outcome = "ranked"
+	end)
+	if not success then return end
+
+	if outcome == "ranked" then
+		local profile = Store.peek(player.UserId)
+		showNotice(player, `{def.Name} is now rank {profile and Model.rank(profile, def.Key) or "?"}.`)
+		FX:FireClient(player, { Kind = "Ranked", Ability = def.Key })
+	elseif outcome == "max" then
+		showNotice(player, `{def.Name} is already at its highest rank.`)
+	elseif outcome == "locked" then
+		showNotice(player, `{def.Name} needs Soul Level {def.RequiresLevel}.`)
+	else
+		showNotice(player, `{def.Name} rank up costs {cost or 0} Souls.`)
+	end
+end
 
 Action.OnServerEvent:Connect(function(player, actionName, payload)
 	local session = sessions[player]
@@ -1236,6 +1802,8 @@ Action.OnServerEvent:Connect(function(player, actionName, payload)
 	elseif actionName == "Attack" then attack(player)
 	elseif actionName == "Pulse" then pulse(player)
 	elseif actionName == "Dash" then dash(player)
+	elseif actionName == "UpgradeMove" then
+		if type(payload) == "string" then upgradeMove(player, payload) end
 	elseif actionName == "Upgrade" then
 		local outcome, paid
 		local success = mutate(player, function(profile)
@@ -1262,7 +1830,7 @@ Action.OnServerEvent:Connect(function(player, actionName, payload)
 		end)
 		if success then
 			if outcome == "reborn" then teleportToZone(player, 1); showNotice(player, "Reborn: permanent damage increased by 10%.")
-			else showNotice(player, `Open Zone 2 and hold {cost} Souls to rebirth.`) end
+			else showNotice(player, `Open the Ash Gate and hold {cost} Souls to rebirth.`) end
 		end
 	elseif actionName == "ClaimDaily" then
 		local outcome
@@ -1319,12 +1887,13 @@ Players.PlayerAdded:Connect(function(player)
 			billboard.Size = UDim2.fromOffset(230, 34)
 			billboard.StudsOffset = Vector3.new(0, 2.7, 0)
 			billboard.AlwaysOnTop = true
+			billboard.MaxDistance = 140
 			billboard.Parent = head
 			local label = Instance.new("TextLabel")
 			label.Name = "Label"
 			label.Size = UDim2.fromScale(1, 1)
 			label.BackgroundTransparency = 1
-			label.TextColor3 = Color3.fromRGB(214, 144, 255)
+			label.TextColor3 = palette.GoldLight
 			label.TextStrokeTransparency = 0.2
 			label.Font = Enum.Font.GothamBold
 			label.TextScaled = true
@@ -1346,7 +1915,7 @@ Players.PlayerAdded:Connect(function(player)
 
 	Commerce.refreshPass(player)
 	publish(player)
-	showNotice(player, "Defeat the nearby shade. ATTACK is ready now.")
+	showNotice(player, "Read the sign ahead, then strike the nearest shade.")
 	refreshFriends()
 end)
 
@@ -1368,16 +1937,18 @@ local function bossSlam(enemy)
 	enemy:SetAttribute("NextSlam", os.clock() + 7.5)
 	local zoneId = enemy:GetAttribute("Zone")
 	local zone = Config.Zones[zoneId]
-	local center = Vector3.new(enemyRoot.Position.X, zone.Origin.Y + 1.25, enemyRoot.Position.Z)
-	local warning = makePart(world, "WardenWarning", Vector3.new(0.22, 2, 2), CFrame.new(center) * CFrame.Angles(0, 0, math.rad(90)), zone.Color, Enum.Material.Neon)
+	local center = Vector3.new(enemyRoot.Position.X, zone.Origin.Y + built.FloorY + 0.2, enemyRoot.Position.Z)
+
+	local warning = World.makePart(world, "WardenWarning", Vector3.new(0.22, 2, 2), CFrame.new(center) * CFrame.Angles(0, 0, math.rad(90)), palette.CrimsonLit, Enum.Material.Neon)
 	warning.Shape = Enum.PartType.Cylinder
-	warning.Transparency = 0.58
+	warning.Transparency = 0.5
 	warning.CanCollide = false
 	FX:FireAllClients({ Kind = "BossCharge", Position = center })
-	local tween = TweenService:Create(warning, TweenInfo.new(1.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		Size = Vector3.new(0.22, 36, 36), Transparency = 0.28,
-	})
-	tween:Play()
+
+	TweenService:Create(warning, TweenInfo.new(1.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = Vector3.new(0.22, 38, 38), Transparency = 0.22,
+	}):Play()
+
 	task.delay(1.15, function()
 		if warning.Parent then warning:Destroy() end
 		if not enemy.Parent or not enemy.PrimaryPart then return end
@@ -1386,11 +1957,12 @@ local function bossSlam(enemy)
 			local character = player.Character
 			local playerRoot = character and character:FindFirstChild("HumanoidRootPart")
 			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-			if session.Zone == zoneId and playerRoot and humanoid and humanoid.Health &gt; 0 and (playerRoot.Position - center).Magnitude &lt;= 18 then
+			if session.Zone == zoneId and playerRoot and humanoid and humanoid.Health &gt; 0 and (playerRoot.Position - center).Magnitude &lt;= 19 then
 				if os.clock() &lt;= session.DodgeUntil then
 					FX:FireClient(player, { Kind = "Dodge" })
 				else
 					humanoid:TakeDamage(math.floor((enemy:GetAttribute("AttackDamage") or zone.EnemyDamage) * 1.7))
+					FX:FireClient(player, { Kind = "Struck", Position = center })
 				end
 			end
 		end
@@ -1398,9 +1970,11 @@ local function bossSlam(enemy)
 	end)
 end
 
--- Resolved once per tick: repeatedly indexing player.Character mid-loop is how the old
--- version threw, and an error here used to kill the thread and freeze every enemy for
--- the rest of the server's life.
+-- Enemy behaviour -----------------------------------------------------------
+-- Three states. An enemy holds its post until you come inside Engage, chases while you
+-- stay inside Leash, then walks home and heals. Nothing trails the player forever, and
+-- nothing attacks from across the arena.
+
 local function livingTargets()
 	local targets = {}
 	for player, session in sessions do
@@ -1414,44 +1988,84 @@ local function livingTargets()
 	return targets
 end
 
+local STEP = 0.4
+
+local function setState(enemy, state)
+	if enemy:GetAttribute("State") == state then return end
+	enemy:SetAttribute("State", state)
+	local entry = enemies[enemy]
+	if entry then
+		entry.Title.Text = state == "Chasing" and `! {entry.Name}` or entry.Name
+	end
+end
+
 local function stepEnemies()
 	local targets = livingTargets()
-	if #targets == 0 then return end
+	local aggro = Config.Aggro
+
 	for enemy in enemies do
 		local enemyRoot = enemy.PrimaryPart
 		local humanoid = enemy:FindFirstChildOfClass("Humanoid")
 		if not enemy.Parent or not enemyRoot or not humanoid or humanoid.Health &lt;= 0 then continue end
+
 		local zoneId = enemy:GetAttribute("Zone")
+		local home = enemy:GetAttribute("Home") or enemyRoot.Position
+		local baseSpeed = enemy:GetAttribute("BaseSpeed") or 10
+		local state = enemy:GetAttribute("State") or "Idle"
+		local homeDistance = (enemyRoot.Position - home).Magnitude
+
 		local nearest, nearestDistance
 		for _, target in targets do
 			if target.Session.Zone == zoneId then
 				local distance = (target.Root.Position - enemyRoot.Position).Magnitude
-				if distance &lt; 90 and (not nearestDistance or distance &lt; nearestDistance) then
+				if not nearestDistance or distance &lt; nearestDistance then
 					nearest, nearestDistance = target, distance
 				end
 			end
 		end
-		if not nearest then continue end
 
-		humanoid:MoveTo(nearest.Root.Position)
-		if enemy:GetAttribute("Boss") and nearestDistance &lt; 32 and os.clock() &gt;= (enemy:GetAttribute("NextSlam") or 0) then
-			bossSlam(enemy)
+		if state == "Chasing" then
+			local lost = not nearest or nearestDistance &gt; aggro.Leash or homeDistance &gt; aggro.Leash
+			if lost then setState(enemy, "Returning") end
+		elseif nearest and nearestDistance &lt;= aggro.Engage and homeDistance &lt;= aggro.Leash then
+			setState(enemy, "Chasing")
 		end
-		local attackRange = enemy:GetAttribute("AttackRange") or 5
-		if nearestDistance &lt; attackRange and os.clock() &gt;= (enemy:GetAttribute("NextHit") or 0) then
-			enemy:SetAttribute("NextHit", os.clock() + (enemy:GetAttribute("AttackCooldown") or 1.2))
-			if os.clock() &lt;= nearest.Session.DodgeUntil then
-				FX:FireClient(nearest.Player, { Kind = "Dodge" })
-			else
-				nearest.Humanoid:TakeDamage(enemy:GetAttribute("AttackDamage") or Config.Zones[zoneId].EnemyDamage)
-				FX:FireClient(nearest.Player, { Kind = "Struck", Position = enemyRoot.Position })
+		state = enemy:GetAttribute("State")
+
+		if state == "Chasing" and nearest then
+			humanoid.WalkSpeed = baseSpeed
+			humanoid:MoveTo(nearest.Root.Position)
+
+			if enemy:GetAttribute("Boss") and nearestDistance &lt; 34 and os.clock() &gt;= (enemy:GetAttribute("NextSlam") or 0) then
+				bossSlam(enemy)
+			end
+			local attackRange = enemy:GetAttribute("AttackRange") or 5
+			if nearestDistance &lt; attackRange and os.clock() &gt;= (enemy:GetAttribute("NextHit") or 0) then
+				enemy:SetAttribute("NextHit", os.clock() + (enemy:GetAttribute("AttackCooldown") or 1.2))
+				if os.clock() &lt;= nearest.Session.DodgeUntil then
+					FX:FireClient(nearest.Player, { Kind = "Dodge" })
+				else
+					nearest.Humanoid:TakeDamage(enemy:GetAttribute("AttackDamage") or Config.Zones[zoneId].EnemyDamage)
+					FX:FireClient(nearest.Player, { Kind = "Struck", Position = enemyRoot.Position })
+				end
+			end
+		else
+			-- Disengaged: walk home a little faster than it chased, and heal on the way.
+			humanoid.WalkSpeed = baseSpeed * aggro.ReturnSpeed
+			if homeDistance &gt; 4 then
+				humanoid:MoveTo(home)
+			elseif state == "Returning" then
+				setState(enemy, "Idle")
+			end
+			if humanoid.Health &lt; humanoid.MaxHealth then
+				humanoid.Health = math.min(humanoid.MaxHealth, humanoid.Health + aggro.RegenPerSecond * STEP)
 			end
 		end
 	end
 end
 
 task.spawn(function()
-	while task.wait(0.4) do
+	while task.wait(STEP) do
 		local ok, err = pcall(stepEnemies)
 		if not ok then warn(`Soul Grind enemy step failed: {err}`) end
 	end
@@ -1495,7 +2109,7 @@ task.spawn(function()
 		if not ok then warn(`Soul Grind session step failed: {err}`) end
 	end
 end)
-</ProtectedString><string name="Name">Main</string></Properties></Item></Item><Item class="StarterPlayer" referent="RBX17"><Properties><bool name="Archivable">true</bool><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX16"><Properties><bool name="Archivable">true</bool><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX15"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local ContextActionService = game:GetService("ContextActionService")
+</ProtectedString><string name="Name">Main</string></Properties></Item></Item><Item class="StarterPlayer" referent="RBX19"><Properties><bool name="Archivable">true</bool><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX18"><Properties><bool name="Archivable">true</bool><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX17"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">local ContextActionService = game:GetService("ContextActionService")
 local Debris = game:GetService("Debris")
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
@@ -1507,39 +2121,45 @@ local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local remotes = ReplicatedStorage:WaitForChild("SoulGrind")
--- Ranges and cooldowns come from the same module the server reads, so the target plate
--- can never promise a reach the server will refuse.
-local Config = require(remotes:WaitForChild("Config"))
 local Action = remotes:WaitForChild("Action")
 local State = remotes:WaitForChild("State")
 local Notice = remotes:WaitForChild("Notice")
 local Offer = remotes:WaitForChild("Offer")
 local FX = remotes:WaitForChild("FX")
+-- Ranges, cooldowns, ability definitions and quest text all come from the same modules
+-- the server reads, so the HUD can never promise something the server will refuse.
+local Config = require(remotes:WaitForChild("Config"))
+local Quests = require(remotes:WaitForChild("Quests"))
 
-local ink = Color3.fromRGB(10, 9, 19)
-local panelColor = Color3.fromRGB(23, 18, 38)
-local purple = Color3.fromRGB(181, 82, 255)
-local cyan = Color3.fromRGB(74, 220, 255)
-local pale = Color3.fromRGB(238, 230, 255)
-local muted = Color3.fromRGB(170, 157, 194)
-local ember = Color3.fromRGB(255, 126, 71)
+local ink = Color3.fromRGB(20, 13, 14)
+local panelColor = Color3.fromRGB(38, 25, 26)
+local gold = Color3.fromRGB(201, 162, 74)
+local goldLight = Color3.fromRGB(232, 200, 120)
+local goldPale = Color3.fromRGB(255, 233, 168)
+local crimson = Color3.fromRGB(184, 54, 47)
+local crimsonLit = Color3.fromRGB(217, 82, 74)
+local pale = Color3.fromRGB(238, 228, 214)
+local muted = Color3.fromRGB(168, 148, 136)
+local ember = Color3.fromRGB(224, 138, 60)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "SoulGrindUI"
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = player:WaitForChild("PlayerGui")
 
-local function round(object, radius)
+-- Helpers --------------------------------------------------------------------
+
+local function round(object, radius, strokeColor)
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, radius or 10)
 	corner.Parent = object
 	local stroke = Instance.new("UIStroke")
-	stroke.Color = purple
-	stroke.Transparency = 0.45
+	stroke.Color = strokeColor or gold
+	stroke.Transparency = 0.55
 	stroke.Thickness = 1
 	stroke.Parent = object
+	return stroke
 end
 
 local function gradient(object, first, second, rotation)
@@ -1579,19 +2199,44 @@ local function button(parent, name, text, size, position, color)
 	control.TextWrapped = true
 	control.Font = Enum.Font.GothamBold
 	control.Parent = parent
-	round(control, 9)
+	round(control, 8)
 	return control
 end
 
+local function bar(parent, name, size, position, fillColor, backColor)
+	local back = Instance.new("Frame")
+	back.Name = name
+	back.Size = size
+	back.Position = position
+	back.BackgroundColor3 = backColor or Color3.fromRGB(46, 30, 32)
+	back.BorderSizePixel = 0
+	back.Parent = parent
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(1, 0)
+	corner.Parent = back
+
+	local fill = Instance.new("Frame")
+	fill.Name = "Fill"
+	fill.Size = UDim2.fromScale(0, 1)
+	fill.BackgroundColor3 = fillColor or gold
+	fill.BorderSizePixel = 0
+	fill.Parent = back
+	local fillCorner = corner:Clone()
+	fillCorner.Parent = fill
+	return back, fill
+end
+
+-- HUD ------------------------------------------------------------------------
+
 local hud = Instance.new("Frame")
 hud.Name = "HUD"
-hud.Size = UDim2.new(0, 370, 0, 206)
+hud.Size = UDim2.new(0, 372, 0, 196)
 hud.Position = UDim2.fromOffset(18, 18)
 hud.BackgroundColor3 = ink
 hud.BackgroundTransparency = 0.06
 hud.Parent = gui
-round(hud, 14)
-gradient(hud, Color3.fromRGB(18, 14, 29), Color3.fromRGB(8, 10, 18), 18)
+round(hud, 12)
+gradient(hud, Color3.fromRGB(38, 23, 24), Color3.fromRGB(16, 11, 12), 20)
 local hudScale = Instance.new("UIScale")
 hudScale.Parent = hud
 
@@ -1599,45 +2244,81 @@ local accent = Instance.new("Frame")
 accent.Name = "Accent"
 accent.Size = UDim2.new(0, 4, 1, -24)
 accent.Position = UDim2.fromOffset(0, 12)
-accent.BackgroundColor3 = purple
+accent.BackgroundColor3 = gold
 accent.BorderSizePixel = 0
 accent.Parent = hud
 local accentCorner = Instance.new("UICorner")
 accentCorner.CornerRadius = UDim.new(1, 0)
 accentCorner.Parent = accent
-gradient(accent, purple, cyan, 90)
+gradient(accent, gold, crimson, 90)
 
-local title = textLabel(hud, "Title", "SOUL GRIND", UDim2.new(0, 190, 0, 26), UDim2.fromOffset(16, 10), 20, purple)
+local title = textLabel(hud, "Title", "SOUL GRIND", UDim2.new(0, 200, 0, 26), UDim2.fromOffset(16, 10), 20, gold)
 title.Font = Enum.Font.GothamBlack
-local zoneTag = textLabel(hud, "Zone", "AWAKENING", UDim2.fromOffset(142, 24), UDim2.new(1, -155, 0, 10), 11, cyan, Enum.TextXAlignment.Right)
+local zoneTag = textLabel(hud, "Zone", "AWAKENING", UDim2.fromOffset(142, 24), UDim2.new(1, -155, 0, 10), 11, crimsonLit, Enum.TextXAlignment.Right)
 zoneTag.Font = Enum.Font.GothamBold
 local stats = textLabel(hud, "Stats", "Loading your soul...", UDim2.new(1, -32, 0, 48), UDim2.fromOffset(16, 40), 16, pale)
-local goal = textLabel(hud, "Goal", "", UDim2.new(1, -32, 0, 34), UDim2.fromOffset(16, 94), 13, pale)
-goal.Font = Enum.Font.GothamBold
-local goalBack = Instance.new("Frame")
-goalBack.Name = "GoalTrack"
-goalBack.Size = UDim2.new(1, -32, 0, 7)
-goalBack.Position = UDim2.fromOffset(16, 133)
-goalBack.BackgroundColor3 = Color3.fromRGB(40, 34, 52)
-goalBack.BorderSizePixel = 0
-goalBack.Parent = hud
-local goalCorner = Instance.new("UICorner")
-goalCorner.CornerRadius = UDim.new(1, 0)
-goalCorner.Parent = goalBack
-local goalFill = Instance.new("Frame")
-goalFill.Name = "Fill"
-goalFill.Size = UDim2.fromScale(0, 1)
-goalFill.BackgroundColor3 = purple
-goalFill.BorderSizePixel = 0
-goalFill.Parent = goalBack
-local goalFillCorner = goalCorner:Clone()
-goalFillCorner.Parent = goalFill
-gradient(goalFill, purple, cyan)
-local save = textLabel(hud, "Save", "", UDim2.new(1, -32, 0, 18), UDim2.fromOffset(16, 149), 11, muted)
-local controls = textLabel(hud, "Controls", "F or CLICK strike   •   Q pulse   •   E step   •   WASD move", UDim2.new(1, -32, 0, 16), UDim2.fromOffset(16, 167), 11, cyan)
+local questRate = textLabel(hud, "Rate", "QUESTS 0 / 8   •   0% COMPLETE", UDim2.new(1, -32, 0, 18), UDim2.fromOffset(16, 92), 12, goldLight)
+questRate.Font = Enum.Font.GothamBold
+local _, rateFill = bar(hud, "RateTrack", UDim2.new(1, -32, 0, 7), UDim2.fromOffset(16, 114), gold)
+local dailyLine = textLabel(hud, "DailyLine", "", UDim2.new(1, -32, 0, 18), UDim2.fromOffset(16, 128), 11, muted)
+local _, goalFill = bar(hud, "GoalTrack", UDim2.new(1, -32, 0, 6), UDim2.fromOffset(16, 148), crimsonLit)
+local save = textLabel(hud, "Save", "", UDim2.new(1, -32, 0, 16), UDim2.fromOffset(16, 158), 11, muted)
+local controls = textLabel(hud, "Controls", "F or CLICK strike   •   Q pulse   •   E step   •   WASD move", UDim2.new(1, -32, 0, 16), UDim2.fromOffset(16, 174), 11, goldLight)
 
--- The drain overlay is the whole point: a button that visibly recharges tells the player
--- "the input landed, wait" instead of leaving them convinced the key is broken.
+-- Objective banner -----------------------------------------------------------
+-- The single most important element on screen. It answers "what am I supposed to do"
+-- without the player opening anything, and it matches the stone signs in the world.
+
+local objective = Instance.new("Frame")
+objective.Name = "Objective"
+objective.Size = UDim2.fromOffset(440, 104)
+objective.Position = UDim2.new(0.5, -220, 0, 16)
+objective.BackgroundColor3 = ink
+objective.BackgroundTransparency = 0.05
+objective.Parent = gui
+round(objective, 12)
+gradient(objective, Color3.fromRGB(44, 26, 24), Color3.fromRGB(18, 12, 13), 90)
+local objectiveScale = Instance.new("UIScale")
+objectiveScale.Parent = objective
+
+local objectiveTag = textLabel(objective, "Tag", "OBJECTIVE", UDim2.new(1, -24, 0, 15), UDim2.fromOffset(16, 9), 11, gold, Enum.TextXAlignment.Center)
+objectiveTag.Font = Enum.Font.GothamBold
+local objectiveTitle = textLabel(objective, "Title", "Finding your charge...", UDim2.new(1, -24, 0, 26), UDim2.fromOffset(12, 26), 20, goldPale, Enum.TextXAlignment.Center)
+objectiveTitle.Font = Enum.Font.GothamBlack
+local objectiveHint = textLabel(objective, "Hint", "", UDim2.new(1, -30, 0, 18), UDim2.fromOffset(15, 54), 12, pale, Enum.TextXAlignment.Center)
+local _, objectiveFill = bar(objective, "Track", UDim2.new(1, -32, 0, 8), UDim2.fromOffset(16, 78), goldLight)
+local objectiveCount = textLabel(objective, "Count", "", UDim2.new(1, -32, 0, 14), UDim2.fromOffset(16, 86), 11, muted, Enum.TextXAlignment.Center)
+
+-- Target plate ---------------------------------------------------------------
+
+local targetFrame = Instance.new("Frame")
+targetFrame.Name = "Target"
+targetFrame.Size = UDim2.fromOffset(330, 70)
+targetFrame.Position = UDim2.new(0.5, -165, 0, 128)
+targetFrame.BackgroundColor3 = ink
+targetFrame.BackgroundTransparency = 0.1
+targetFrame.Visible = false
+targetFrame.Parent = gui
+round(targetFrame, 10)
+local targetName = textLabel(targetFrame, "Name", "", UDim2.new(1, -24, 0, 22), UDim2.fromOffset(12, 6), 14, pale, Enum.TextXAlignment.Center)
+targetName.Font = Enum.Font.GothamBold
+local _, targetFill = bar(targetFrame, "Track", UDim2.new(1, -32, 0, 8), UDim2.fromOffset(16, 32), crimsonLit)
+targetFill.Size = UDim2.fromScale(1, 1)
+local targetRange = textLabel(targetFrame, "Range", "", UDim2.new(1, -24, 0, 16), UDim2.fromOffset(12, 45), 12, muted, Enum.TextXAlignment.Center)
+
+-- Only the current target is outlined. Nothing else in the world glows.
+local targetOutline = Instance.new("Highlight")
+targetOutline.Name = "TargetOutline"
+targetOutline.FillColor = goldPale
+targetOutline.FillTransparency = 0.94
+targetOutline.OutlineColor = goldPale
+targetOutline.OutlineTransparency = 0.05
+targetOutline.DepthMode = Enum.HighlightDepthMode.Occluded
+targetOutline.Enabled = false
+targetOutline.Parent = gui
+
+-- Ability bar ----------------------------------------------------------------
+
 local function addCooldownOverlay(control)
 	control.ClipsDescendants = true
 	local cool = Instance.new("Frame")
@@ -1645,7 +2326,7 @@ local function addCooldownOverlay(control)
 	cool.AnchorPoint = Vector2.new(0, 1)
 	cool.Position = UDim2.fromScale(0, 1)
 	cool.Size = UDim2.fromScale(1, 0)
-	cool.BackgroundColor3 = Color3.fromRGB(6, 5, 12)
+	cool.BackgroundColor3 = Color3.fromRGB(8, 5, 6)
 	cool.BackgroundTransparency = 0.45
 	cool.BorderSizePixel = 0
 	cool.Visible = false
@@ -1654,24 +2335,29 @@ local function addCooldownOverlay(control)
 	return control
 end
 
--- One bar, one UIScale: the three controls shrink together on a phone instead of
--- sliding off the edge of the screen.
 local abilityBar = Instance.new("Frame")
 abilityBar.Name = "Abilities"
 abilityBar.AnchorPoint = Vector2.new(0.5, 1)
 abilityBar.Position = UDim2.new(0.5, 0, 1, -18)
-abilityBar.Size = UDim2.fromOffset(444, 82)
+abilityBar.Size = UDim2.fromOffset(444, 84)
 abilityBar.BackgroundTransparency = 1
 abilityBar.Parent = gui
 local abilityScale = Instance.new("UIScale")
 abilityScale.Parent = abilityBar
 
-local attackButton = addCooldownOverlay(button(abilityBar, "Attack", "F / CLICK\nSOUL STRIKE", UDim2.fromOffset(140, 82), UDim2.fromOffset(0, 0), Color3.fromRGB(122, 44, 180)))
-gradient(attackButton, Color3.fromRGB(158, 60, 226), Color3.fromRGB(88, 32, 136), 90)
-local pulseButton = addCooldownOverlay(button(abilityBar, "Pulse", "Q\nSOUL PULSE", UDim2.fromOffset(140, 82), UDim2.fromOffset(152, 0), Color3.fromRGB(32, 120, 156)))
-gradient(pulseButton, Color3.fromRGB(46, 160, 196), Color3.fromRGB(26, 88, 124), 90)
-local dashButton = addCooldownOverlay(button(abilityBar, "Dash", "E\nSOUL STEP", UDim2.fromOffset(140, 82), UDim2.fromOffset(304, 0), Color3.fromRGB(132, 72, 54)))
-gradient(dashButton, Color3.fromRGB(196, 96, 60), Color3.fromRGB(96, 46, 52), 90)
+local attackButton = addCooldownOverlay(button(abilityBar, "Attack", "F / CLICK\nSOUL STRIKE", UDim2.fromOffset(140, 84), UDim2.fromOffset(0, 0), Color3.fromRGB(132, 40, 36)))
+gradient(attackButton, Color3.fromRGB(168, 52, 44), Color3.fromRGB(94, 28, 26), 90)
+local pulseButton = addCooldownOverlay(button(abilityBar, "Pulse", "Q\nSOUL PULSE", UDim2.fromOffset(140, 84), UDim2.fromOffset(152, 0), Color3.fromRGB(150, 110, 44)))
+gradient(pulseButton, Color3.fromRGB(184, 140, 56), Color3.fromRGB(104, 76, 30), 90)
+local dashButton = addCooldownOverlay(button(abilityBar, "Dash", "E\nSOUL STEP", UDim2.fromOffset(140, 84), UDim2.fromOffset(304, 0), Color3.fromRGB(122, 82, 44)))
+gradient(dashButton, Color3.fromRGB(156, 106, 56), Color3.fromRGB(86, 58, 32), 90)
+
+local rankPips = {}
+for key, control in { Strike = attackButton, Pulse = pulseButton, Step = dashButton } do
+	local pips = textLabel(control, "Rank", "", UDim2.new(1, -12, 0, 14), UDim2.fromOffset(6, 66), 11, goldPale, Enum.TextXAlignment.Center)
+	pips.ZIndex = 4
+	rankPips[key] = pips
+end
 
 local function sweep(control, seconds)
 	local cool = control:FindFirstChild("Cool")
@@ -1680,8 +2366,7 @@ local function sweep(control, seconds)
 	cool.Visible = true
 	local token = os.clock()
 	cool:SetAttribute("Token", token)
-	local tween = TweenService:Create(cool, TweenInfo.new(seconds, Enum.EasingStyle.Linear), { Size = UDim2.fromScale(1, 0) })
-	tween:Play()
+	TweenService:Create(cool, TweenInfo.new(seconds, Enum.EasingStyle.Linear), { Size = UDim2.fromScale(1, 0) }):Play()
 	task.delay(seconds, function()
 		if cool:GetAttribute("Token") == token then cool.Visible = false end
 	end)
@@ -1692,74 +2377,36 @@ local function press(control)
 	if not stroke then return end
 	stroke.Transparency = 0
 	stroke.Thickness = 3
-	TweenService:Create(stroke, TweenInfo.new(0.22), { Transparency = 0.45, Thickness = 1 }):Play()
+	TweenService:Create(stroke, TweenInfo.new(0.22), { Transparency = 0.55, Thickness = 1 }):Play()
 end
 
-local menuButton = button(gui, "MenuToggle", "JOURNAL", UDim2.fromOffset(115, 42), UDim2.new(1, -131, 0, 84), panelColor)
-local inviteButton = button(gui, "Invite", "INVITE FRIEND", UDim2.fromOffset(140, 42), UDim2.new(1, -286, 0, 84), panelColor)
-gradient(menuButton, Color3.fromRGB(38, 29, 58), Color3.fromRGB(20, 18, 31), 90)
-gradient(inviteButton, Color3.fromRGB(51, 30, 67), Color3.fromRGB(24, 18, 35), 90)
-
-local targetFrame = Instance.new("Frame")
-targetFrame.Name = "Target"
-targetFrame.Size = UDim2.fromOffset(330, 74)
-targetFrame.Position = UDim2.new(0.5, -165, 0, 18)
-targetFrame.BackgroundColor3 = ink
-targetFrame.BackgroundTransparency = 0.08
-targetFrame.Visible = false
-targetFrame.Parent = gui
-round(targetFrame, 12)
-gradient(targetFrame, Color3.fromRGB(31, 20, 42), Color3.fromRGB(12, 12, 20))
-local targetName = textLabel(targetFrame, "Name", "", UDim2.new(1, -24, 0, 24), UDim2.fromOffset(12, 6), 14, pale, Enum.TextXAlignment.Center)
-targetName.Font = Enum.Font.GothamBold
-local targetBack = Instance.new("Frame")
-targetBack.Size = UDim2.new(1, -32, 0, 8)
-targetBack.Position = UDim2.fromOffset(16, 37)
-targetBack.BackgroundColor3 = Color3.fromRGB(45, 35, 49)
-targetBack.BorderSizePixel = 0
-targetBack.Parent = targetFrame
-local targetCorner = Instance.new("UICorner")
-targetCorner.CornerRadius = UDim.new(1, 0)
-targetCorner.Parent = targetBack
-local targetFill = Instance.new("Frame")
-targetFill.Size = UDim2.fromScale(1, 1)
-targetFill.BackgroundColor3 = purple
-targetFill.BorderSizePixel = 0
-targetFill.Parent = targetBack
-local targetFillCorner = targetCorner:Clone()
-targetFillCorner.Parent = targetFill
-local targetRange = textLabel(targetFrame, "Range", "", UDim2.new(1, -24, 0, 16), UDim2.fromOffset(12, 48), 12, muted, Enum.TextXAlignment.Center)
-
-local comboLabel = textLabel(gui, "Combo", "", UDim2.fromOffset(300, 48), UDim2.new(0.5, -150, 0.68, 0), 22, pale, Enum.TextXAlignment.Center)
-comboLabel.Font = Enum.Font.GothamBlack
-comboLabel.TextStrokeTransparency = 0.2
-comboLabel.Visible = false
+-- Health + damage ------------------------------------------------------------
 
 local healthPanel = Instance.new("Frame")
 healthPanel.Name = "Health"
 healthPanel.Size = UDim2.fromOffset(215, 28)
-healthPanel.Position = UDim2.new(0, 18, 1, -116)
+healthPanel.Position = UDim2.new(0, 18, 1, -118)
 healthPanel.BackgroundColor3 = ink
 healthPanel.BackgroundTransparency = 0.08
 healthPanel.Parent = gui
-round(healthPanel, 10)
+round(healthPanel, 9)
 local healthFill = Instance.new("Frame")
 healthFill.Name = "Fill"
 healthFill.Size = UDim2.fromScale(1, 1)
-healthFill.BackgroundColor3 = ember
+healthFill.BackgroundColor3 = crimson
 healthFill.BorderSizePixel = 0
 healthFill.Parent = healthPanel
 local healthCorner = Instance.new("UICorner")
-healthCorner.CornerRadius = UDim.new(0, 9)
+healthCorner.CornerRadius = UDim.new(0, 8)
 healthCorner.Parent = healthFill
-gradient(healthFill, Color3.fromRGB(229, 61, 76), ember)
+gradient(healthFill, Color3.fromRGB(150, 30, 28), ember)
 local healthText = textLabel(healthPanel, "Text", "BODY 100 / 100", UDim2.fromScale(1, 1), UDim2.fromOffset(0, 0), 12, pale, Enum.TextXAlignment.Center)
 healthText.ZIndex = 2
 
 local damageFlash = Instance.new("Frame")
 damageFlash.Name = "DamageFlash"
 damageFlash.Size = UDim2.fromScale(1, 1)
-damageFlash.BackgroundColor3 = Color3.fromRGB(170, 15, 35)
+damageFlash.BackgroundColor3 = Color3.fromRGB(150, 18, 24)
 damageFlash.BackgroundTransparency = 1
 damageFlash.BorderSizePixel = 0
 damageFlash.ZIndex = 50
@@ -1767,24 +2414,141 @@ damageFlash.Active = false
 damageFlash.Selectable = false
 damageFlash.Parent = gui
 
+local comboLabel = textLabel(gui, "Combo", "", UDim2.fromOffset(360, 48), UDim2.new(0.5, -180, 0.68, 0), 22, pale, Enum.TextXAlignment.Center)
+comboLabel.Font = Enum.Font.GothamBlack
+comboLabel.TextStrokeTransparency = 0.2
+comboLabel.Visible = false
+
+-- Journal --------------------------------------------------------------------
+
+local menuButton = button(gui, "MenuToggle", "JOURNAL", UDim2.fromOffset(120, 42), UDim2.new(1, -136, 0, 18), panelColor)
+local inviteButton = button(gui, "Invite", "INVITE FRIEND", UDim2.fromOffset(140, 42), UDim2.new(1, -286, 0, 18), panelColor)
+gradient(menuButton, Color3.fromRGB(58, 38, 34), Color3.fromRGB(28, 18, 19), 90)
+gradient(inviteButton, Color3.fromRGB(70, 44, 36), Color3.fromRGB(32, 20, 20), 90)
+
 local menu = Instance.new("Frame")
 menu.Name = "Journal"
-menu.Size = UDim2.fromOffset(360, 490)
+menu.Size = UDim2.fromOffset(392, 540)
 menu.AnchorPoint = Vector2.new(1, 0)
-menu.Position = UDim2.new(1, -16, 0, 136)
+menu.Position = UDim2.new(1, -16, 0, 70)
 menu.BackgroundColor3 = ink
 menu.BackgroundTransparency = 0.04
 menu.Visible = false
 menu.Parent = gui
 round(menu, 12)
-gradient(menu, Color3.fromRGB(20, 15, 32), Color3.fromRGB(8, 10, 18), 35)
+gradient(menu, Color3.fromRGB(40, 24, 24), Color3.fromRGB(16, 11, 12), 35)
 local menuScale = Instance.new("UIScale")
 menuScale.Parent = menu
 
-local menuTitle = textLabel(menu, "Title", "UNDERWORLD JOURNAL", UDim2.new(1, -24, 0, 30), UDim2.fromOffset(12, 10), 19, purple)
+local menuTitle = textLabel(menu, "Title", "UNDERWORLD JOURNAL", UDim2.new(1, -24, 0, 28), UDim2.fromOffset(14, 10), 18, gold)
 menuTitle.Font = Enum.Font.GothamBlack
-local daily = textLabel(menu, "Daily", "", UDim2.new(1, -24, 0, 82), UDim2.fromOffset(12, 48), 14, pale)
-local checkIn = textLabel(menu, "CheckIn", "", UDim2.new(1, -24, 0, 52), UDim2.fromOffset(12, 126), 13, cyan)
+
+local tabs = {}
+local pages = {}
+local function showTab(name)
+	for tabName, tabButton in tabs do
+		local on = tabName == name
+		tabButton.BackgroundColor3 = on and Color3.fromRGB(96, 60, 30) or panelColor
+		tabButton.TextColor3 = on and goldPale or muted
+		pages[tabName].Visible = on
+	end
+end
+
+local tabNames = { "QUESTS", "MOVES", "REALM" }
+for index, name in tabNames do
+	local tab = button(menu, name, name, UDim2.fromOffset(118, 32), UDim2.fromOffset(14 + (index - 1) * 122, 44), panelColor)
+	tab.TextSize = 13
+	tabs[name] = tab
+
+	local page = Instance.new("Frame")
+	page.Name = name .. "Page"
+	page.Size = UDim2.new(1, -28, 1, -96)
+	page.Position = UDim2.fromOffset(14, 86)
+	page.BackgroundTransparency = 1
+	page.Visible = false
+	page.Parent = menu
+	pages[name] = page
+
+	tab.Activated:Connect(function() showTab(name) end)
+end
+
+-- Quests page: one row per quest, so the whole chain is visible, not just the next step.
+local questHeader = textLabel(pages.QUESTS, "Header", "0 OF 8 COMPLETE   •   0%", UDim2.new(1, 0, 0, 20), UDim2.fromOffset(0, 0), 13, goldLight)
+questHeader.Font = Enum.Font.GothamBold
+
+local questScroll = Instance.new("ScrollingFrame")
+questScroll.Size = UDim2.new(1, 0, 1, -28)
+questScroll.Position = UDim2.fromOffset(0, 26)
+questScroll.BackgroundTransparency = 1
+questScroll.BorderSizePixel = 0
+questScroll.ScrollBarThickness = 4
+questScroll.ScrollBarImageColor3 = gold
+questScroll.CanvasSize = UDim2.new()
+questScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+questScroll.Parent = pages.QUESTS
+local questLayout = Instance.new("UIListLayout")
+questLayout.Padding = UDim.new(0, 8)
+questLayout.SortOrder = Enum.SortOrder.LayoutOrder
+questLayout.Parent = questScroll
+
+local questRows = {}
+for index, quest in Quests.list do
+	local row = Instance.new("Frame")
+	row.Name = quest.Id
+	row.Size = UDim2.new(1, -8, 0, 74)
+	row.BackgroundColor3 = panelColor
+	row.BackgroundTransparency = 0.3
+	row.LayoutOrder = index
+	row.Parent = questScroll
+	local stroke = round(row, 8)
+
+	local rowTitle = textLabel(row, "Title", `{index}. {quest.Title}`, UDim2.new(1, -74, 0, 18), UDim2.fromOffset(10, 7), 13, pale)
+	rowTitle.Font = Enum.Font.GothamBold
+	local rowCount = textLabel(row, "Count", "", UDim2.fromOffset(62, 18), UDim2.new(1, -70, 0, 7), 12, goldLight, Enum.TextXAlignment.Right)
+	local rowDetail = textLabel(row, "Detail", quest.Detail, UDim2.new(1, -20, 0, 26), UDim2.fromOffset(10, 26), 11, muted)
+	local _, rowFill = bar(row, "Track", UDim2.new(1, -20, 0, 6), UDim2.fromOffset(10, 58), gold)
+
+	questRows[quest.Id] = { Row = row, Stroke = stroke, Title = rowTitle, Count = rowCount, Detail = rowDetail, Fill = rowFill }
+end
+
+-- Moves page: soul level plus a rank track for each ability.
+local levelCard = Instance.new("Frame")
+levelCard.Size = UDim2.new(1, 0, 0, 60)
+levelCard.BackgroundColor3 = panelColor
+levelCard.BackgroundTransparency = 0.3
+levelCard.Parent = pages.MOVES
+round(levelCard, 8)
+local levelText = textLabel(levelCard, "Text", "", UDim2.new(1, -140, 1, -12), UDim2.fromOffset(10, 6), 12, pale)
+local upgrade = button(levelCard, "Upgrade", "UPGRADE", UDim2.fromOffset(120, 42), UDim2.new(1, -130, 0, 9), Color3.fromRGB(120, 78, 34))
+
+local moveCards = {}
+for index, def in Config.Abilities do
+	local card = Instance.new("Frame")
+	card.Name = def.Key
+	card.Size = UDim2.new(1, 0, 0, 84)
+	card.Position = UDim2.fromOffset(0, 68 + (index - 1) * 92)
+	card.BackgroundColor3 = panelColor
+	card.BackgroundTransparency = 0.3
+	card.Parent = pages.MOVES
+	round(card, 8)
+
+	local name = textLabel(card, "Name", def.Name, UDim2.new(1, -140, 0, 18), UDim2.fromOffset(10, 7), 13, goldPale)
+	name.Font = Enum.Font.GothamBold
+	local detail = textLabel(card, "Detail", def.Detail, UDim2.new(1, -140, 0, 40), UDim2.fromOffset(10, 26), 11, muted)
+	local _, rankFill = bar(card, "Track", UDim2.new(1, -140, 0, 6), UDim2.fromOffset(10, 68), goldLight)
+	local rankUp = button(card, "Rank", "RANK UP", UDim2.fromOffset(120, 62), UDim2.new(1, -130, 0, 11), Color3.fromRGB(120, 78, 34))
+	rankUp.TextSize = 13
+
+	rankUp.Activated:Connect(function()
+		press(rankUp)
+		Action:FireServer("UpgradeMove", def.Key)
+	end)
+	moveCards[def.Key] = { Def = def, Card = card, Name = name, Detail = detail, Fill = rankFill, Button = rankUp }
+end
+
+-- Realm page: everything that is not a quest or a move.
+local daily = textLabel(pages.REALM, "Daily", "", UDim2.new(1, 0, 0, 74), UDim2.fromOffset(0, 0), 12, pale)
+local checkIn = textLabel(pages.REALM, "CheckIn", "", UDim2.new(1, 0, 0, 48), UDim2.fromOffset(0, 80), 11, goldLight)
 for _, card in { daily, checkIn } do
 	card.BackgroundColor3 = panelColor
 	card.BackgroundTransparency = 0.35
@@ -1795,28 +2559,31 @@ for _, card in { daily, checkIn } do
 	padding.Parent = card
 end
 
-local claim = button(menu, "Claim", "CLAIM DAILY", UDim2.new(0.5, -18, 0, 42), UDim2.fromOffset(12, 184), Color3.fromRGB(64, 80, 126))
-local upgrade = button(menu, "Upgrade", "UPGRADE", UDim2.new(0.5, -18, 0, 54), UDim2.new(0.5, 6, 0, 184), Color3.fromRGB(91, 42, 133))
-local gateButton = button(menu, "Gate", "OPEN / ENTER\nASH GATE", UDim2.new(0.5, -18, 0, 54), UDim2.fromOffset(12, 246), Color3.fromRGB(109, 48, 139))
-local travelButton = button(menu, "Travel", "TRAVEL\nZONE 1", UDim2.new(0.5, -18, 0, 54), UDim2.new(0.5, 6, 0, 246), Color3.fromRGB(35, 92, 118))
-local rebirth = button(menu, "Rebirth", "REBIRTH", UDim2.new(0.5, -18, 0, 54), UDim2.fromOffset(12, 308), Color3.fromRGB(121, 42, 78))
-local flare = button(menu, "Flare", "SOUL FLARE", UDim2.new(0.5, -18, 0, 54), UDim2.new(0.5, 6, 0, 308), Color3.fromRGB(66, 54, 122))
-local aura = button(menu, "Aura", "VIOLET AURA", UDim2.new(0.5, -18, 0, 54), UDim2.fromOffset(12, 370), Color3.fromRGB(87, 38, 125))
-local collection = textLabel(menu, "Collection", "", UDim2.new(0.5, -18, 0, 88), UDim2.new(0.5, 6, 0, 370), 12, muted)
+local claim = button(pages.REALM, "Claim", "CLAIM DAILY", UDim2.new(0.5, -6, 0, 42), UDim2.fromOffset(0, 136), Color3.fromRGB(104, 66, 30))
+local gateButton = button(pages.REALM, "Gate", "OPEN ASH GATE\n150 SOULS", UDim2.new(0.5, -6, 0, 42), UDim2.new(0.5, 6, 0, 136), Color3.fromRGB(126, 46, 40))
+local travelButton = button(pages.REALM, "Travel", "TRAVEL\nZONE 2", UDim2.new(0.5, -6, 0, 50), UDim2.fromOffset(0, 186), Color3.fromRGB(96, 62, 30))
+local rebirth = button(pages.REALM, "Rebirth", "REBIRTH", UDim2.new(0.5, -6, 0, 50), UDim2.new(0.5, 6, 0, 186), Color3.fromRGB(126, 40, 54))
+local flare = button(pages.REALM, "Flare", "SOUL FLARE", UDim2.new(0.5, -6, 0, 50), UDim2.fromOffset(0, 244), Color3.fromRGB(110, 70, 36))
+local aura = button(pages.REALM, "Aura", "VIOLET AURA", UDim2.new(0.5, -6, 0, 50), UDim2.new(0.5, 6, 0, 244), Color3.fromRGB(96, 46, 84))
+local collection = textLabel(pages.REALM, "Collection", "", UDim2.new(1, 0, 0, 90), UDim2.fromOffset(0, 302), 11, muted)
+
+showTab("QUESTS")
+
+-- Dialogs --------------------------------------------------------------------
 
 local rebirthConfirm = Instance.new("Frame")
-rebirthConfirm.Size = UDim2.fromOffset(330, 170)
-rebirthConfirm.Position = UDim2.new(0.5, -165, 0.5, -85)
+rebirthConfirm.Size = UDim2.fromOffset(340, 176)
+rebirthConfirm.Position = UDim2.new(0.5, -170, 0.5, -88)
 rebirthConfirm.BackgroundColor3 = ink
 rebirthConfirm.Visible = false
 rebirthConfirm.ZIndex = 20
 rebirthConfirm.Parent = gui
 round(rebirthConfirm, 12)
-local confirmText = textLabel(rebirthConfirm, "Warning", "REBIRTH?\nSouls and Soul Level reset. Zones, collection, and +10% permanent damage remain.", UDim2.new(1, -24, 0, 95), UDim2.fromOffset(12, 12), 15, pale, Enum.TextXAlignment.Center)
+local confirmText = textLabel(rebirthConfirm, "Warning", "REBIRTH?\nSouls and Soul Level reset. Zones, sigils, move ranks and +10% permanent damage remain.", UDim2.new(1, -24, 0, 100), UDim2.fromOffset(12, 12), 14, pale, Enum.TextXAlignment.Center)
 confirmText.ZIndex = 21
-local confirm = button(rebirthConfirm, "Confirm", "REBIRTH", UDim2.fromOffset(140, 44), UDim2.fromOffset(18, 112), Color3.fromRGB(126, 37, 72))
+local confirm = button(rebirthConfirm, "Confirm", "REBIRTH", UDim2.fromOffset(145, 44), UDim2.fromOffset(18, 118), Color3.fromRGB(126, 37, 52))
 confirm.ZIndex = 21
-local cancel = button(rebirthConfirm, "Cancel", "CANCEL", UDim2.fromOffset(140, 44), UDim2.fromOffset(172, 112), panelColor)
+local cancel = button(rebirthConfirm, "Cancel", "CANCEL", UDim2.fromOffset(145, 44), UDim2.fromOffset(177, 118), panelColor)
 cancel.ZIndex = 21
 
 local offerPanel = Instance.new("Frame")
@@ -1829,21 +2596,23 @@ offerPanel.Parent = gui
 round(offerPanel, 12)
 local offerScale = Instance.new("UIScale")
 offerScale.Parent = offerPanel
-local offerTitle = textLabel(offerPanel, "Title", "", UDim2.new(1, -24, 0, 34), UDim2.fromOffset(12, 14), 19, purple, Enum.TextXAlignment.Center)
+local offerTitle = textLabel(offerPanel, "Title", "", UDim2.new(1, -24, 0, 34), UDim2.fromOffset(12, 14), 19, gold, Enum.TextXAlignment.Center)
 offerTitle.ZIndex = 31
 local offerDescription = textLabel(offerPanel, "Description", "", UDim2.new(1, -30, 0, 95), UDim2.fromOffset(15, 55), 14, pale, Enum.TextXAlignment.Center)
 offerDescription.ZIndex = 31
-local buy = button(offerPanel, "Buy", "VIEW ROBUX PRICE", UDim2.fromOffset(180, 48), UDim2.fromOffset(20, 170), Color3.fromRGB(92, 43, 138))
+local buy = button(offerPanel, "Buy", "VIEW ROBUX PRICE", UDim2.fromOffset(180, 48), UDim2.fromOffset(20, 170), Color3.fromRGB(122, 78, 34))
 buy.ZIndex = 31
 local closeOffer = button(offerPanel, "Close", "KEEP PLAYING", UDim2.fromOffset(125, 48), UDim2.fromOffset(210, 170), panelColor)
 closeOffer.ZIndex = 31
 
-local toast = textLabel(gui, "Toast", "", UDim2.new(0, 430, 0, 52), UDim2.new(0.5, -215, 0, 102), 16, pale, Enum.TextXAlignment.Center)
+local toast = textLabel(gui, "Toast", "", UDim2.new(0, 460, 0, 52), UDim2.new(0.5, -230, 0, 208), 16, pale, Enum.TextXAlignment.Center)
 toast.BackgroundColor3 = ink
 toast.BackgroundTransparency = 0.08
 toast.Visible = false
 toast.ZIndex = 40
 round(toast, 10)
+
+-- State ----------------------------------------------------------------------
 
 local latestState
 local latestRevision = -1
@@ -1852,9 +2621,10 @@ local toastToken = 0
 
 local function resize()
 	local viewport = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(800, 600)
-	hudScale.Scale = math.min(1, (viewport.X - 24) / 370)
+	hudScale.Scale = math.min(1, (viewport.X - 24) / 372)
 	abilityScale.Scale = math.min(1, (viewport.X - 32) / 444)
-	menuScale.Scale = math.min(1, (viewport.X - 24) / 360, (viewport.Y - 84) / 490)
+	objectiveScale.Scale = math.min(1, (viewport.X - 420) / 440, 1)
+	menuScale.Scale = math.min(1, (viewport.X - 24) / 392, (viewport.Y - 96) / 540)
 	offerScale.Scale = math.min(1, (viewport.X - 24) / 350, (viewport.Y - 40) / 235)
 end
 
@@ -1868,7 +2638,7 @@ local function toastMessage(message)
 	toast.TextTransparency = 0
 	toast.BackgroundTransparency = 0.08
 	toast.Visible = true
-	task.delay(2.4, function()
+	task.delay(2.6, function()
 		if token ~= toastToken then return end
 		local tween = TweenService:Create(toast, TweenInfo.new(0.35), { TextTransparency = 1, BackgroundTransparency = 1 })
 		tween:Play()
@@ -1881,25 +2651,85 @@ local function collectionText(items)
 	local names = {}
 	for name, owned in items or {} do if owned then table.insert(names, name) end end
 	table.sort(names)
-	return #names == 0 and "COLLECTION\nNo sigils yet" or `COLLECTION ({#names})\n{table.concat(names, ", ")}`
+	return #names == 0 and "SIGILS\nNone bound yet" or `SIGILS ({#names})\n{table.concat(names, ", ")}`
 end
 
 local function render(state)
 	latestState = state
-	local zoneNames = { "CINDER HOLLOW", "FROZEN PURGATORY" }
+	local zoneNames = { "CINDER HOLLOW", "MOLTEN RELIQUARY" }
 	zoneTag.Text = zoneNames[state.Zone] or `ZONE {state.Zone}`
 	stats.Text = `{state.Souls} SOULS     LV {state.Level}     {state.Damage} DMG\n{state.Rebirths} REBIRTHS{state.FriendBonus and "     +10% CO-PLAY" or ""}`
-	goal.Text = `NEXT - {state.NextGoal}`
+
+	local quests = state.Quests or { Progress = {}, Completed = 0, Total = Quests.count, Rate = 0 }
+	questRate.Text = `QUESTS {quests.Completed} / {quests.Total}   •   {quests.Rate}% COMPLETE`
+	rateFill.Size = UDim2.fromScale(quests.Rate / 100, 1)
+	questHeader.Text = `{quests.Completed} OF {quests.Total} COMPLETE   •   {quests.Rate}%`
+
+	local active = quests.ActiveId and Quests.byId(quests.ActiveId)
+	if active then
+		local value = quests.Progress[active.Id] or 0
+		objectiveTitle.Text = active.Title
+		objectiveHint.Text = active.Hint
+		objectiveFill.Size = UDim2.fromScale(math.clamp(value / active.Target, 0, 1), 1)
+		objectiveCount.Text = `{active.Detail}     ({value} / {active.Target})`
+	else
+		objectiveTitle.Text = "All charges bound"
+		objectiveHint.Text = "Rebirth again, or take a friend through the Ash Gate."
+		objectiveFill.Size = UDim2.fromScale(1, 1)
+		objectiveCount.Text = ""
+	end
+
+	for _, quest in Quests.list do
+		local row = questRows[quest.Id]
+		local value = quests.Progress[quest.Id] or 0
+		local done = value &gt;= quest.Target
+		row.Count.Text = done and "DONE" or `{value} / {quest.Target}`
+		row.Count.TextColor3 = done and goldPale or muted
+		row.Fill.Size = UDim2.fromScale(math.clamp(value / quest.Target, 0, 1), 1)
+		row.Fill.BackgroundColor3 = done and gold or crimsonLit
+		row.Title.TextColor3 = done and muted or pale
+		row.Detail.Text = quests.ActiveId == quest.Id and quest.Hint or quest.Detail
+		row.Stroke.Transparency = quests.ActiveId == quest.Id and 0 or 0.75
+		row.Row.BackgroundTransparency = quests.ActiveId == quest.Id and 0.1 or 0.45
+	end
+
+	dailyLine.Text = `DAILY  {math.min(state.DailyKills, state.DailyGoal)} / {state.DailyGoal} shades`
 	goalFill.Size = UDim2.fromScale(math.clamp(state.DailyKills / state.DailyGoal, 0, 1), 1)
 	save.Text = `{state.SaveStatus}   |   Ember Chain {state.Streak} days`
+
 	pulseButton.Text = state.PulseUnlocked and "Q\nSOUL PULSE" or "Q\nLOCKED - LV 3"
-	pulseButton.BackgroundColor3 = state.PulseUnlocked and Color3.fromRGB(32, 120, 156) or Color3.fromRGB(62, 60, 76)
-	daily.Text = `DAILY — {state.DailyName}\n{math.min(state.DailyKills, state.DailyGoal)}/{state.DailyGoal} shades  •  Reward: {state.DailyReward} free flares\n{state.DailyClaimed and "Claimed today" or "Returns daily; missed days do not erase your chain."}`
+	pulseButton.BackgroundColor3 = state.PulseUnlocked and Color3.fromRGB(150, 110, 44) or Color3.fromRGB(64, 54, 50)
+
+	local upgrades = state.Upgrades or {}
+	local costs = state.AbilityCosts or {}
+	for key, entry in moveCards do
+		local rank = upgrades[key] or 0
+		local def = entry.Def
+		entry.Name.Text = `{def.Name}   —   RANK {rank} / {def.Max}`
+		entry.Fill.Size = UDim2.fromScale(rank / def.Max, 1)
+		if state.Level &lt; def.RequiresLevel then
+			entry.Button.Text = `NEEDS\nLV {def.RequiresLevel}`
+			entry.Button.BackgroundColor3 = Color3.fromRGB(64, 54, 50)
+		elseif rank &gt;= def.Max then
+			entry.Button.Text = "MAX\nRANK"
+			entry.Button.BackgroundColor3 = Color3.fromRGB(96, 78, 40)
+		else
+			entry.Button.Text = `RANK UP\n{costs[key] or "?"} SOULS`
+			entry.Button.BackgroundColor3 = (state.Souls &gt;= (costs[key] or math.huge)) and Color3.fromRGB(140, 92, 38) or Color3.fromRGB(78, 58, 38)
+		end
+		if rankPips[key] then
+			rankPips[key].Text = rank &gt; 0 and string.rep("•", rank) or ""
+		end
+	end
+
+	levelText.Text = `SOUL LEVEL {state.Level}\nRaises base damage and unlocks Soul Pulse at 3.`
+	upgrade.Text = `UPGRADE\n{state.UpgradeCost} SOULS`
+
+	daily.Text = `DAILY — {state.DailyName}\n{math.min(state.DailyKills, state.DailyGoal)}/{state.DailyGoal} shades  •  Reward: {state.DailyReward} free flares\n{state.DailyClaimed and "Claimed today" or "Missed days never erase your chain."}`
 	local seconds = math.min(state.ActiveSeconds, 600)
 	checkIn.Text = `ACTIVE CHECK-IN  {math.floor(seconds / 60)}:{string.format("%02d", seconds % 60)} / 10:00\nRequires 3 shades today • Reward: 2 free flares{state.CheckInClaimed and " • Complete" or ""}`
 	claim.Text = state.DailyClaimed and "DAILY CLAIMED" or "CLAIM DAILY"
-	upgrade.Text = `UPGRADE TO LV {state.Level + 1}\n{state.UpgradeCost} SOULS`
-	gateButton.Text = state.MaxZone &gt;= 2 and "ENTER\nFROZEN PURGATORY" or "OPEN ASH GATE\n150 SOULS"
+	gateButton.Text = state.MaxZone &gt;= 2 and "ENTER\nRELIQUARY" or "OPEN ASH GATE\n150 SOULS"
 	travelButton.Text = state.Zone == 1 and "TRAVEL\nZONE 2" or "TRAVEL\nZONE 1"
 	rebirth.Text = `REBIRTH\n{state.RebirthCost} SOULS`
 	flare.Text = `SOUL FLARE\n{state.FlareCount} READY`
@@ -1914,6 +2744,8 @@ State.OnClientEvent:Connect(function(state)
 end)
 Notice.OnClientEvent:Connect(toastMessage)
 
+-- Effects --------------------------------------------------------------------
+
 local function floatingDamage(position, damage, combo)
 	local anchor = Instance.new("Part")
 	anchor.Name = "DamageNumber"
@@ -1921,35 +2753,35 @@ local function floatingDamage(position, damage, combo)
 	anchor.Position = position + Vector3.new(0, 3.5, 0)
 	anchor.Anchored = true
 	anchor.CanCollide = false
+	anchor.CanQuery = false
 	anchor.Transparency = 1
 	anchor.Parent = workspace
 	local billboard = Instance.new("BillboardGui")
 	billboard.Size = UDim2.fromOffset(130, 52)
 	billboard.AlwaysOnTop = true
 	billboard.Parent = anchor
-	local label = textLabel(billboard, "Damage", `-{damage}`, UDim2.fromScale(1, 1), UDim2.fromOffset(0, 0), combo == 3 and 28 or 21, combo == 3 and ember or pale, Enum.TextXAlignment.Center)
+	local label = textLabel(billboard, "Damage", `-{damage}`, UDim2.fromScale(1, 1), UDim2.fromOffset(0, 0), combo == 3 and 28 or 21, combo == 3 and goldPale or pale, Enum.TextXAlignment.Center)
 	label.Font = Enum.Font.GothamBlack
 	label.TextStrokeTransparency = 0.15
-	local travel = TweenService:Create(anchor, TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = anchor.Position + Vector3.new(0, 3, 0) })
-	local fade = TweenService:Create(label, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.3), { TextTransparency = 1, TextStrokeTransparency = 1 })
-	travel:Play()
-	fade:Play()
+	TweenService:Create(anchor, TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = anchor.Position + Vector3.new(0, 3, 0) }):Play()
+	TweenService:Create(label, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.3), { TextTransparency = 1, TextStrokeTransparency = 1 }):Play()
 	Debris:AddItem(anchor, 0.7)
 end
 
-local function burst(position, color, amount, scale)
+local function burst(position, color, amount)
 	local anchor = Instance.new("Part")
 	anchor.Name = "SoulBurst"
 	anchor.Size = Vector3.new(0.25, 0.25, 0.25)
 	anchor.Position = position
 	anchor.Anchored = true
 	anchor.CanCollide = false
+	anchor.CanQuery = false
 	anchor.Transparency = 1
 	anchor.Parent = workspace
 	local emitter = Instance.new("ParticleEmitter")
 	emitter.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-	emitter.Color = ColorSequence.new(color, Color3.new(1, 1, 1))
-	emitter.LightEmission = 1
+	emitter.Color = ColorSequence.new(color, goldPale)
+	emitter.LightEmission = 0.9
 	emitter.Lifetime = NumberRange.new(0.35, 0.8)
 	emitter.Rate = 0
 	emitter.Speed = NumberRange.new(8, 20)
@@ -1959,77 +2791,78 @@ local function burst(position, color, amount, scale)
 	Debris:AddItem(anchor, 1.2)
 end
 
+local function flashCombo(text, color, seconds)
+	comboLabel.Text = text
+	comboLabel.TextColor3 = color
+	comboLabel.TextTransparency = 0
+	comboLabel.Visible = true
+	local token = os.clock()
+	comboLabel:SetAttribute("Token", token)
+	task.delay(seconds or 0.7, function()
+		if comboLabel:GetAttribute("Token") == token then comboLabel.Visible = false end
+	end)
+end
+
 FX.OnClientEvent:Connect(function(effect)
 	if type(effect) ~= "table" or type(effect.Kind) ~= "string" then return end
+
 	if effect.Kind == "Hit" and effect.Position then
 		floatingDamage(effect.Position, tonumber(effect.Damage) or 0, tonumber(effect.Combo) or 0)
-		burst(effect.Position, effect.Combo == 3 and ember or purple, effect.Combo == 3 and 46 or 22, effect.Combo == 3 and 0.65 or 0.38)
+		burst(effect.Position, effect.Combo == 3 and goldPale or crimsonLit, effect.Combo == 3 and 46 or 22)
 		if effect.Combo and effect.Combo &gt; 0 then
-			comboLabel.Text = effect.Combo == 3 and "SOUL BREAK  x3" or `CHAIN  x{effect.Combo}`
-			comboLabel.TextColor3 = effect.Combo == 3 and ember or pale
-			comboLabel.Visible = true
-			comboLabel.TextTransparency = 0
-			local comboToken = os.clock()
-			comboLabel:SetAttribute("Token", comboToken)
-			task.delay(0.7, function()
-				if comboLabel:GetAttribute("Token") ~= comboToken then return end
-				TweenService:Create(comboLabel, TweenInfo.new(0.2), { TextTransparency = 1 }):Play()
-				task.wait(0.22)
-				if comboLabel:GetAttribute("Token") == comboToken then comboLabel.Visible = false end
-			end)
+			flashCombo(effect.Combo == 3 and "SOUL BREAK  x3" or `CHAIN  x{effect.Combo}`, effect.Combo == 3 and goldPale or pale)
 		end
-	elseif effect.Kind == "Death" and effect.Position then
-		burst(effect.Position, effect.Color or purple, effect.Boss and 100 or 52, effect.Boss and 1.15 or 0.7)
 	elseif effect.Kind == "Swing" then
 		press(attackButton)
 		sweep(attackButton, effect.Cooldown)
 		local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 		if rootPart then
-			burst(rootPart.Position + rootPart.CFrame.LookVector * 4 + Vector3.new(0, 1.5, 0), effect.Combo == 3 and ember or purple, effect.Combo == 3 and 34 or 14, 0.3)
+			burst(rootPart.Position + rootPart.CFrame.LookVector * 4 + Vector3.new(0, 1.5, 0), effect.Combo == 3 and goldPale or crimsonLit, effect.Combo == 3 and 34 or 14)
 		end
 	elseif effect.Kind == "Cooling" then
 		press(attackButton)
+	elseif effect.Kind == "Miss" then
+		-- A miss says why. Silence here is what made Soul Strike feel broken.
+		local distance = tonumber(effect.Distance)
+		flashCombo(distance and `TOO FAR - {math.floor(distance)} STUDS TO NEAREST` or "NOTHING STIRS HERE", muted, 0.8)
 	elseif effect.Kind == "Struck" then
 		damageFlash.BackgroundTransparency = 0.7
 		TweenService:Create(damageFlash, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()
+	elseif effect.Kind == "Death" and effect.Position then
+		burst(effect.Position, effect.Color or crimsonLit, effect.Boss and 100 or 52)
 	elseif effect.Kind == "Dash" and effect.Player then
 		local character = effect.Player.Character
 		local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-		if rootPart then burst(rootPart.Position, cyan, 26, 0.35) end
-		if effect.Player == player then sweep(dashButton, effect.Cooldown); press(dashButton) end
-		if effect.Player == player and workspace.CurrentCamera then
-			local camera = workspace.CurrentCamera
-			TweenService:Create(camera, TweenInfo.new(0.1), { FieldOfView = 78 }):Play()
-			task.delay(0.12, function() TweenService:Create(camera, TweenInfo.new(0.25), { FieldOfView = 70 }):Play() end)
+		if rootPart then burst(rootPart.Position, ember, 26) end
+		if effect.Player == player then
+			press(dashButton)
+			sweep(dashButton, effect.Cooldown)
+			if workspace.CurrentCamera then
+				local camera = workspace.CurrentCamera
+				TweenService:Create(camera, TweenInfo.new(0.1), { FieldOfView = 78 }):Play()
+				task.delay(0.12, function() TweenService:Create(camera, TweenInfo.new(0.25), { FieldOfView = 70 }):Play() end)
+			end
 		end
 	elseif effect.Kind == "Dodge" then
-		comboLabel.Text = "PHASED"
-		comboLabel.TextColor3 = cyan
-		comboLabel.TextTransparency = 0
-		comboLabel.Visible = true
-		task.delay(0.55, function() comboLabel.Visible = false end)
+		flashCombo("PHASED", goldPale, 0.55)
 	elseif effect.Kind == "BossCharge" then
-		toastMessage("WARDEN SLAM - SOUL STEP THROUGH IT")
+		toastMessage("WARDEN SLAM — SOUL STEP (E) THROUGH IT")
 	elseif effect.Kind == "BossSlam" and effect.Position then
-		burst(effect.Position, cyan, 90, 0.9)
+		burst(effect.Position, crimsonLit, 90)
 	elseif effect.Kind == "Pulse" and effect.Position then
-		burst(effect.Position, cyan, 65, 0.65)
+		burst(effect.Position, goldLight, 65)
 		press(pulseButton)
 		sweep(pulseButton, effect.Cooldown)
-	elseif effect.Kind == "Miss" then
-		-- A miss now says why. Silence here is what made Soul Strike feel broken.
-		local distance = tonumber(effect.Distance)
-		comboLabel.Text = distance and `TOO FAR - {math.floor(distance)} STUDS TO NEAREST` or "NO SOULS IN THIS REALM"
-		comboLabel.TextColor3 = muted
-		comboLabel.TextTransparency = 0
-		comboLabel.Visible = true
-		local missToken = os.clock()
-		comboLabel:SetAttribute("Token", missToken)
-		task.delay(0.8, function()
-			if comboLabel:GetAttribute("Token") == missToken then comboLabel.Visible = false end
-		end)
+	elseif effect.Kind == "Quest" then
+		flashCombo(`QUEST COMPLETE — {effect.Title}`, goldPale, 2)
+		local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if rootPart then burst(rootPart.Position + Vector3.new(0, 3, 0), gold, 70) end
+	elseif effect.Kind == "Ranked" then
+		flashCombo("RANK UP", goldPale, 1)
 	end
 end)
+
+-- Health ---------------------------------------------------------------------
 
 local lastHealth
 local function bindHealth(character)
@@ -2052,6 +2885,8 @@ end
 player.CharacterAdded:Connect(bindHealth)
 if player.Character then task.spawn(bindHealth, player.Character) end
 
+-- Targeting ------------------------------------------------------------------
+
 local targetClock = 0
 RunService.RenderStepped:Connect(function(delta)
 	targetClock += delta
@@ -2059,27 +2894,46 @@ RunService.RenderStepped:Connect(function(delta)
 	targetClock = 0
 	local characterRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	local soulWorld = workspace:FindFirstChild("SoulGrindWorld")
-	if not characterRoot or not soulWorld then targetFrame.Visible = false; return end
+	if not characterRoot or not soulWorld then
+		targetFrame.Visible = false
+		targetOutline.Enabled = false
+		return
+	end
+
 	local nearest, nearestDistance
 	for _, candidate in soulWorld:GetChildren() do
 		if candidate:IsA("Model") and candidate:GetAttribute("Enemy") and candidate.PrimaryPart then
 			local humanoid = candidate:FindFirstChildOfClass("Humanoid")
 			if humanoid and humanoid.Health &gt; 0 then
 				local distance = (candidate.PrimaryPart.Position - characterRoot.Position).Magnitude
-				if distance &lt;= 90 and (not nearestDistance or distance &lt; nearestDistance) then nearest, nearestDistance = candidate, distance end
+				if distance &lt;= 110 and (not nearestDistance or distance &lt; nearestDistance) then
+					nearest, nearestDistance = candidate, distance
+				end
 			end
 		end
 	end
-	if not nearest then targetFrame.Visible = false; return end
+
+	if not nearest then
+		targetFrame.Visible = false
+		targetOutline.Enabled = false
+		return
+	end
+
 	local humanoid = nearest:FindFirstChildOfClass("Humanoid")
 	local inRange = nearestDistance &lt;= Config.AttackRange
 	targetFrame.Visible = true
 	targetName.Text = `{nearest:GetAttribute("Boss") and "BOSS  -  " or ""}{humanoid.DisplayName}`
-	targetFill.BackgroundColor3 = nearest:GetAttribute("Zone") == 2 and cyan or purple
+	targetFill.BackgroundColor3 = nearest:GetAttribute("Boss") and gold or crimsonLit
 	targetFill.Size = UDim2.fromScale(math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1), 1)
 	targetRange.Text = inRange and `IN RANGE  -  {math.floor(nearestDistance)} studs` or `MOVE CLOSER  -  {math.floor(nearestDistance)} studs`
-	targetRange.TextColor3 = inRange and cyan or ember
+	targetRange.TextColor3 = inRange and goldPale or muted
+
+	targetOutline.Adornee = nearest
+	targetOutline.OutlineColor = inRange and goldPale or muted
+	targetOutline.Enabled = true
 end)
+
+-- Offers ---------------------------------------------------------------------
 
 Offer.OnClientEvent:Connect(function(offer)
 	if type(offer) ~= "table" or (offer.kind ~= "Product" and offer.kind ~= "Pass") or type(offer.id) ~= "number" then return end
@@ -2097,8 +2951,10 @@ Offer.OnClientEvent:Connect(function(offer)
 	end)
 end)
 
--- Every input route funnels through these three so a key, a tap, a click and the
--- on-screen button are literally the same code path.
+-- Input ----------------------------------------------------------------------
+-- Every route funnels through these three, so a key, a tap, a click and the on-screen
+-- button are literally the same code path.
+
 local nextLocalAttack = 0
 local function requestAttack()
 	if os.clock() &lt; nextLocalAttack then return false end
@@ -2178,7 +3034,7 @@ task.spawn(function()
 		task.wait(0.5)
 	end
 end)
-</ProtectedString><string name="Name">Client</string></Properties></Item></Item></Item><Item class="ServerStorage" referent="RBX20"><Properties><bool name="Archivable">true</bool><string name="Name">ServerStorage</string></Properties><Item class="Folder" referent="RBX19"><Properties><bool name="Archivable">true</bool><string name="Name">SoulGrindTests</string></Properties><Item class="ModuleScript" referent="RBX18"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Run in the server Command Bar during Play Solo:
+</ProtectedString><string name="Name">Client</string></Properties></Item></Item></Item><Item class="ServerStorage" referent="RBX22"><Properties><bool name="Archivable">true</bool><string name="Name">ServerStorage</string></Properties><Item class="Folder" referent="RBX21"><Properties><bool name="Archivable">true</bool><string name="Name">SoulGrindTests</string></Properties><Item class="ModuleScript" referent="RBX20"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Run in the server Command Bar during Play Solo:
 -- require(game.ServerStorage.SoulGrindTests.CommerceSpec)()
 return function()
 	local Receipt = require(game.ServerScriptService.Receipt)

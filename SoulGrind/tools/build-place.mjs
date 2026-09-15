@@ -17,6 +17,8 @@ function item(className, name, children = "", source) {
 }
 
 const config = read("src/shared/Config.luau");
+const quests = read("src/shared/Quests.luau");
+const world = read("src/server/World.luau");
 const model = read("src/server/Model.luau");
 const store = read("src/server/Store.luau");
 const receipt = read("src/server/Receipt.luau");
@@ -25,14 +27,14 @@ const main = read("src/server/Main.server.luau");
 const client = read("src/client/Client.client.luau");
 const commerceSpec = read("tests/CommerceSpec.luau");
 
-const allSource = [config, model, store, receipt, commerce, main, client, commerceSpec].join("\n");
+const allSource = [config, quests, model, store, receipt, commerce, world, main, client, commerceSpec].join("\n");
 const receiptAssignments = (allSource.match(/ProcessReceipt\s*=/g) || []).length;
 if (receiptAssignments !== 1) throw new Error(`Expected one ProcessReceipt assignment, found ${receiptAssignments}`);
 if (commerce.includes("PromptProductPurchaseFinished:Connect")) throw new Error("Developer products must not be granted from PromptProductPurchaseFinished");
 for (const required of ["UpdateAsync", "PurchaseId", "NotProcessedYet", "PurchaseGranted"]) {
   if (!commerce.concat(store).includes(required)) throw new Error(`Missing commerce safeguard: ${required}`);
 }
-for (const required of ["Attack", "Pulse", "ClaimDaily", "UnlockZone", "Rebirth"]) {
+for (const required of ["Attack", "Pulse", "ClaimDaily", "UnlockZone", "Rebirth", "UpgradeMove"]) {
   if (!main.includes(`${required} = true`)) throw new Error(`Missing server action allowlist entry: ${required}`);
 }
 
@@ -46,6 +48,29 @@ for (const [label, source] of [["server", main], ["client", client]]) {
 if (!client.includes('require(remotes:WaitForChild("Config"))')) {
   throw new Error("The client must require the shared Config module");
 }
+
+// The game has to answer "what am I supposed to do" in three places: the shared quest
+// chain, the HUD banner, and the stone signs standing in the world.
+const questCount = (quests.match(/\bId = "/g) || []).length;
+if (questCount < 6) throw new Error(`Expected a quest chain, found ${questCount} quests`);
+for (const [label, source] of [["server", main], ["client", client]]) {
+  if (!source.includes("Quests")) throw new Error(`The ${label} must read the shared Quests module`);
+}
+if (!main.includes("World.setObjective")) throw new Error("The server must push the active quest to the world signs");
+if (!world.includes("SurfaceGui")) throw new Error("The world must carry readable signs, not just floating labels");
+if (!world.includes("registerQuestSign")) throw new Error("The world must register its quest signs");
+
+// Enemies hold a post and disengage. Without a leash they chase across the whole map.
+for (const required of ["Engage", "Leash", "RegenPerSecond"]) {
+  if (!config.includes(required)) throw new Error(`Config must define Aggro.${required}`);
+}
+for (const required of ["Chasing", "Returning", "Idle"]) {
+  if (!main.includes(`"${required}"`)) throw new Error(`Enemy state machine is missing ${required}`);
+}
+
+// Move ranks are bought on the server and capped there, never trusted from the client.
+if (!main.includes("upgradeMove")) throw new Error("The server must own ability rank purchases");
+if (!model.includes("abilityCost")) throw new Error("Model must own the rank cost curve");
 
 // Every ability needs a key, and Soul Strike also needs pointer input.
 for (const [action, key] of [["SoulAttack", "F"], ["SoulPulse", "Q"], ["SoulStep", "E"]]) {
@@ -62,8 +87,9 @@ for (const kind of ["Swing", "Miss", "Cooling"]) {
 
 const remotes = ["Action", "State", "Notice", "Offer", "FX"].map(name => item("RemoteEvent", name)).join("");
 const replicated = item("ReplicatedStorage", "ReplicatedStorage",
-  item("Folder", "SoulGrind", item("ModuleScript", "Config", "", config) + remotes));
+  item("Folder", "SoulGrind", item("ModuleScript", "Config", "", config) + item("ModuleScript", "Quests", "", quests) + remotes));
 const serverScripts = item("ServerScriptService", "ServerScriptService",
+  item("ModuleScript", "World", "", world) +
   item("ModuleScript", "Model", "", model) +
   item("ModuleScript", "Receipt", "", receipt) +
   item("ModuleScript", "Store", "", store) +

@@ -1,5 +1,7 @@
 local Model = {}
 
+local ABILITY_KEYS = { "Strike", "Pulse", "Step" }
+
 local function number(value, fallback, minimum)
 	if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
 		return fallback
@@ -21,6 +23,7 @@ function Model.new(now)
 		Rebirths = 0,
 		MaxZone = 1,
 		Kills = 0,
+		DeepKills = 0,
 		Bosses = 0,
 		ActiveDays = 1,
 		Streak = 1,
@@ -32,6 +35,8 @@ function Model.new(now)
 		SpendDays = 0,
 		LastSpendDay = -1,
 		Wallet = { Flares = 3 },
+		Upgrades = { Strike = 0, Pulse = 0, Step = 0 },
+		QuestsPaid = {},
 		Collection = {},
 		Receipts = {},
 	}
@@ -49,6 +54,7 @@ function Model.normalize(raw, now)
 	base.Rebirths = number(raw.Rebirths, 0)
 	base.MaxZone = math.clamp(number(raw.MaxZone, 1, 1), 1, 2)
 	base.Kills = number(raw.Kills, 0)
+	base.DeepKills = number(raw.DeepKills, 0)
 	base.Bosses = number(raw.Bosses, 0)
 	base.ActiveDays = number(raw.ActiveDays, 1, 1)
 	base.Streak = number(raw.Streak, 1, 1)
@@ -61,6 +67,21 @@ function Model.normalize(raw, now)
 	base.LastSpendDay = number(raw.LastSpendDay, -1, -1)
 	base.Wallet.Flares = number(type(raw.Wallet) == "table" and raw.Wallet.Flares, 3)
 
+	-- Move ranks are capped here as well as at purchase time, so a tampered or
+	-- half-written save can never hand out a permanently overpowered ability.
+	if type(raw.Upgrades) == "table" then
+		for _, key in ABILITY_KEYS do
+			base.Upgrades[key] = math.clamp(number(raw.Upgrades[key], 0), 0, 10)
+		end
+	end
+
+	if type(raw.QuestsPaid) == "table" then
+		for questId, paid in raw.QuestsPaid do
+			if type(questId) == "string" and paid == true and #questId <= 40 then
+				base.QuestsPaid[questId] = true
+			end
+		end
+	end
 	if type(raw.Collection) == "table" then
 		for key, value in raw.Collection do
 			if type(key) == "string" and value == true and #key <= 40 then
@@ -101,7 +122,43 @@ function Model.rebirthCost(profile)
 end
 
 function Model.damage(profile)
-	return math.floor((8 + profile.Level * 4) * (1 + profile.Rebirths * 0.1))
+	local base = (8 + profile.Level * 4) * (1 + profile.Rebirths * 0.1)
+	return math.floor(base * Model.strikeMultiplier(profile))
+end
+
+-- Ability ranks ---------------------------------------------------------------
+-- Kept as plain arithmetic so the CLI suite can check the curves without Roblox.
+
+function Model.rank(profile, key)
+	return (profile.Upgrades and profile.Upgrades[key]) or 0
+end
+
+function Model.abilityCost(baseCost, growth, rank)
+	return math.floor(baseCost * (growth ^ rank))
+end
+
+function Model.strikeMultiplier(profile)
+	return 1 + 0.14 * Model.rank(profile, "Strike")
+end
+
+function Model.strikeKnocksBack(profile)
+	return Model.rank(profile, "Strike") >= 3
+end
+
+function Model.pulseRange(profile, baseRange)
+	return baseRange + 4 * Model.rank(profile, "Pulse")
+end
+
+function Model.pulseMultiplier(profile)
+	return 1.4 * (1 + 0.12 * Model.rank(profile, "Pulse"))
+end
+
+function Model.dashCooldown(profile, baseCooldown)
+	return math.max(1.2, baseCooldown - 0.4 * Model.rank(profile, "Step"))
+end
+
+function Model.dodgeWindow(profile)
+	return 0.55 + 0.06 * Model.rank(profile, "Step")
 end
 
 function Model.applyMilestones(profile)
@@ -112,18 +169,6 @@ function Model.applyMilestones(profile)
 	if profile.Rebirths >= 1 then profile.Collection.Reborn = true end
 	if profile.ActiveDays >= 7 then profile.Collection.EmberVeteran = true end
 	if profile.ActiveDays >= 20 then profile.Collection.HollowCrown = true end
-end
-
-function Model.nextGoal(profile)
-	if profile.Kills < 1 then return "Defeat your first shade" end
-	if profile.Level < 3 then return "Reach Soul Level 3 to unlock Pulse" end
-	if profile.MaxZone < 2 then return "Gather 150 Souls and open the Ash Gate" end
-	if profile.Bosses < 1 then return "Defeat the Frozen Warden" end
-	if profile.Rebirths < 1 then return "Gather 500 Souls and rebirth" end
-	if profile.Kills < 25 then return "Bind 25 shades into your collection" end
-	if profile.ActiveDays < 7 then return `Return on {7 - profile.ActiveDays} more days for the Ember Veteran sigil` end
-	if profile.ActiveDays < 20 then return `Return on {20 - profile.ActiveDays} more days for the Hollow Crown` end
-	return "Grow your rebirth rank and help a friend through the Ash Gate"
 end
 
 return Model
