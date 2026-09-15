@@ -1,0 +1,61 @@
+{
+  "name": "Soul Grind: Underworld Rising",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "SoulGrind": {
+        "$className": "Folder",
+        "Config": {
+          "$path": "src/shared/Config.luau"
+        },
+        "Action": {
+          "$className": "RemoteEvent"
+        },
+        "State": {
+          "$className": "RemoteEvent"
+        },
+        "Notice": {
+          "$className": "RemoteEvent"
+        },
+        "Offer": {
+          "$className": "RemoteEvent"
+        },
+        "FX": {
+          "$className": "RemoteEvent"
+        }
+      }
+    },
+    "ServerScriptService": {
+      "Model": {
+        "$path": "src/server/Model.luau"
+      },
+      "Receipt": {
+        "$path": "src/server/Receipt.luau"
+      },
+      "Store": {
+        "$path": "src/server/Store.luau"
+      },
+      "Commerce": {
+        "$path": "src/server/Commerce.luau"
+      },
+      "Main": {
+        "$path": "src/server/Main.server.luau"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client/Client.client.luau"
+        }
+      }
+    },
+    "ServerStorage": {
+      "SoulGrindTests": {
+        "$className": "Folder",
+        "CommerceSpec": {
+          "$path": "tests/CommerceSpec.luau"
+        }
+      }
+    }
+  }
+}
