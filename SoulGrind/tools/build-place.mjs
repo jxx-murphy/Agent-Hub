@@ -63,6 +63,17 @@ if (!world.includes("function World.setObjective")) throw new Error("The world m
 // A lit SurfaceGui in a night map is an unreadable one; this is why signs looked blank.
 if (!world.includes("LightInfluence = 0")) throw new Error("Sign faces must not be dimmed by scene lighting");
 
+// Stylised, not blocky: curvature comes from wedges, corner wedges, cylinders and
+// spheres because there is no Blender/.fbx step in this pipeline.
+for (const required of ["WedgePart", "CornerWedgePart", "SpecialMesh", "Enum.PartType.Ball"]) {
+  if (!world.includes(required)) throw new Error(`The world must use ${required} instead of stacked boxes`);
+}
+for (const banned of ["Enum.Material.Concrete", "Enum.Material.Cobblestone", "Enum.Material.Brick"]) {
+  if (world.includes(banned)) throw new Error(`${banned} is the heavy-texture look the art direction rejects`);
+}
+if (!world.includes("Enum.Material.SmoothPlastic")) throw new Error("Structural surfaces must be SmoothPlastic");
+if (!world.includes("CastShadow = false")) throw new Error("Small detail must not cast shadows");
+
 // Enemies hold a post and disengage. Without a leash they chase across the whole map.
 for (const required of ["Engage", "Leash", "RegenPerSecond"]) {
   if (!config.includes(required)) throw new Error(`Config must define Aggro.${required}`);
@@ -106,7 +117,7 @@ const workspace = item("Workspace", "Workspace");
 // Technology is read-only to scripts, so it has to be pinned here. Anything below
 // ShadowMap silently ignores Atmosphere and the environment scales, which is how a
 // carefully lit scene still ends up looking like a black screen.
-const lighting = `<Item class="Lighting" referent="RBX${nextReferent++}"><Properties><bool name="Archivable">true</bool><string name="Name">Lighting</string><token name="Technology">3</token><bool name="GlobalShadows">true</bool></Properties></Item>`;
+const lighting = `<Item class="Lighting" referent="RBX${nextReferent++}"><Properties><bool name="Archivable">true</bool><string name="Name">Lighting</string><token name="Technology">4</token><bool name="GlobalShadows">true</bool></Properties></Item>`;
 
 const xml = `<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4"><External>null</External><External>nil</External>${workspace}${lighting}${replicated}${serverScripts}${starterPlayer}${serverStorage}</roblox>`;
 if (!xml.includes('name="Technology"')) throw new Error("The place file must pin Lighting.Technology");

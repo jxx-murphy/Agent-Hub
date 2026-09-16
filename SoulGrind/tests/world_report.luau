@@ -12,11 +12,18 @@ stub.runServer()
 local world = stub.Workspace:FindFirstChild("SoulGrindWorld")
 local Config = stub.loadModule(`{stub.root}/src/shared/Config.luau`, nil)
 
-local counts, parts, lights = {}, 0, 0
+local buildable = { Part = true, WedgePart = true, CornerWedgePart = true, SpawnLocation = true }
+local counts, parts, lights, smooth, curved = {}, 0, 0, 0, 0
 for _, node in world:GetDescendants() do
-	if node.ClassName == "Part" or node.ClassName == "SpawnLocation" then
+	if buildable[node.ClassName] then
 		parts += 1
 		counts[node.Name] = (counts[node.Name] or 0) + 1
+		if node.Material and node.Material.Name == "SmoothPlastic" then smooth += 1 end
+		if node.ClassName == "WedgePart" or node.ClassName == "CornerWedgePart"
+			or node:FindFirstChildOfClass("SpecialMesh")
+			or (node.Shape and node.Shape.Name == "Ball") then
+			curved += 1
+		end
 	elseif node.ClassName == "PointLight" then
 		lights += 1
 	end
@@ -30,6 +37,8 @@ print("=== Soul Grind world report ===")
 print(`arena per zone : {Config.ArenaHalf.X * 2} x {Config.ArenaHalf.Z * 2} studs`)
 print(`total parts    : {parts}`)
 print(`point lights   : {lights}`)
+print(`smoothplastic  : {math.floor(smooth / parts * 100)}%`)
+print(`curved shapes  : {math.floor(curved / parts * 100)}%  (wedges, cylinders, spheres)`)
 print(`fog            : starts {stub.Lighting.FogStart}, ends {stub.Lighting.FogEnd}`)
 print(`aggro          : engage {Config.Aggro.Engage}, leash {Config.Aggro.Leash}`)
 print("")

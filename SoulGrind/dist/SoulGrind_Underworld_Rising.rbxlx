@@ -1,4 +1,4 @@
-<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4"><External>null</External><External>nil</External><Item class="Workspace" referent="RBX23"><Properties><bool name="Archivable">true</bool><string name="Name">Workspace</string></Properties></Item><Item class="Lighting" referent="RBX24"><Properties><bool name="Archivable">true</bool><string name="Name">Lighting</string><token name="Technology">3</token><bool name="GlobalShadows">true</bool></Properties></Item><Item class="ReplicatedStorage" referent="RBX9"><Properties><bool name="Archivable">true</bool><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX8"><Properties><bool name="Archivable">true</bool><string name="Name">SoulGrind</string></Properties><Item class="ModuleScript" referent="RBX6"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Replace the zero IDs after creating the products in Creator Hub.
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4"><External>null</External><External>nil</External><Item class="Workspace" referent="RBX23"><Properties><bool name="Archivable">true</bool><string name="Name">Workspace</string></Properties></Item><Item class="Lighting" referent="RBX24"><Properties><bool name="Archivable">true</bool><string name="Name">Lighting</string><token name="Technology">4</token><bool name="GlobalShadows">true</bool></Properties></Item><Item class="ReplicatedStorage" referent="RBX9"><Properties><bool name="Archivable">true</bool><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX8"><Properties><bool name="Archivable">true</bool><string name="Name">SoulGrind</string></Properties><Item class="ModuleScript" referent="RBX6"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Replace the zero IDs after creating the products in Creator Hub.
 return {
 	DataStoreName = "SoulGrind_v1",
 	StudioPersistence = false,
@@ -26,29 +26,36 @@ return {
 
 	-- Crimson and gold. Neon is reserved for flame cores, lava seams and the boss
 	-- telegraph; every other surface is a real material lit by real lights.
+	-- Dark anime base: charcoal, indigo-cooled slate and obsidian. Emissive accents stay
+	-- warm (crimson, amber, ember) so fire reads against a cold world instead of joining it.
 	Palette = {
-		Bedrock = Color3.fromRGB(34, 27, 29),
-		Rock = Color3.fromRGB(52, 42, 44),
-		RockLight = Color3.fromRGB(74, 60, 60),
-		Floor = Color3.fromRGB(96, 78, 76),
-		FloorAlt = Color3.fromRGB(116, 95, 90),
-		Stone = Color3.fromRGB(134, 112, 106),
-		StoneDark = Color3.fromRGB(94, 74, 76),
-		Bone = Color3.fromRGB(212, 201, 182),
+		Obsidian = Color3.fromRGB(26, 24, 34),
+		Charcoal = Color3.fromRGB(40, 39, 48),
+		Indigo = Color3.fromRGB(44, 42, 68),
+		Slate = Color3.fromRGB(64, 63, 80),
+		SlateLight = Color3.fromRGB(86, 85, 104),
+		Bedrock = Color3.fromRGB(22, 21, 30),
+		Rock = Color3.fromRGB(52, 51, 66),
+		RockLight = Color3.fromRGB(74, 73, 92),
+		Floor = Color3.fromRGB(70, 68, 86),
+		FloorAlt = Color3.fromRGB(88, 86, 106),
+		Stone = Color3.fromRGB(104, 102, 124),
+		StoneDark = Color3.fromRGB(58, 57, 74),
+		Bone = Color3.fromRGB(206, 202, 214),
+		Plaster = Color3.fromRGB(112, 110, 130),
+		Timber = Color3.fromRGB(62, 52, 60),
+		Roof = Color3.fromRGB(46, 44, 62),
+		Cobble = Color3.fromRGB(78, 77, 94),
+		Iron = Color3.fromRGB(38, 37, 48),
 		Gold = Color3.fromRGB(201, 162, 74),
 		GoldLight = Color3.fromRGB(232, 200, 120),
 		GoldPale = Color3.fromRGB(255, 233, 168),
 		Crimson = Color3.fromRGB(140, 35, 32),
 		CrimsonMid = Color3.fromRGB(184, 54, 47),
 		CrimsonLit = Color3.fromRGB(217, 82, 74),
-		Iron = Color3.fromRGB(58, 52, 54),
-		Ember = Color3.fromRGB(224, 138, 60),
-		-- Medieval building materials. Dark, but never black.
-		Plaster = Color3.fromRGB(128, 116, 104),
-		Timber = Color3.fromRGB(84, 60, 44),
-		Roof = Color3.fromRGB(72, 52, 54),
-		Cobble = Color3.fromRGB(104, 92, 88),
 		CrimsonDeep = Color3.fromRGB(96, 30, 30),
+		Ember = Color3.fromRGB(224, 138, 60),
+		Amber = Color3.fromRGB(255, 176, 96),
 	},
 
 	-- Progression spends souls on the moves themselves, not only on a damage number.
@@ -110,9 +117,9 @@ return {
 			Origin = Vector3.new(0, 0, 0),
 			Accent = Color3.fromRGB(184, 54, 47),
 			AccentLight = Color3.fromRGB(217, 82, 74),
-			Floor = Color3.fromRGB(88, 76, 68),
-			FloorAlt = Color3.fromRGB(108, 94, 84),
-			Stone = Color3.fromRGB(134, 112, 106),
+			Floor = Color3.fromRGB(66, 64, 82),
+			FloorAlt = Color3.fromRGB(84, 82, 102),
+			Stone = Color3.fromRGB(104, 102, 124),
 			EnemyHealth = 36,
 			EnemyDamage = 7,
 			SoulReward = 10,
@@ -122,9 +129,9 @@ return {
 			Origin = Vector3.new(520, 0, 0),
 			Accent = Color3.fromRGB(201, 162, 74),
 			AccentLight = Color3.fromRGB(232, 200, 120),
-			Floor = Color3.fromRGB(96, 88, 84),
-			FloorAlt = Color3.fromRGB(118, 108, 102),
-			Stone = Color3.fromRGB(142, 120, 96),
+			Floor = Color3.fromRGB(74, 70, 88),
+			FloorAlt = Color3.fromRGB(92, 88, 108),
+			Stone = Color3.fromRGB(112, 108, 130),
 			EnemyHealth = 95,
 			EnemyDamage = 12,
 			SoulReward = 28,
@@ -269,14 +276,20 @@ end
 return Quests
 </ProtectedString><string name="Name">Quests</string></Properties></Item><Item class="RemoteEvent" referent="RBX1"><Properties><bool name="Archivable">true</bool><string name="Name">Action</string></Properties></Item><Item class="RemoteEvent" referent="RBX2"><Properties><bool name="Archivable">true</bool><string name="Name">State</string></Properties></Item><Item class="RemoteEvent" referent="RBX3"><Properties><bool name="Archivable">true</bool><string name="Name">Notice</string></Properties></Item><Item class="RemoteEvent" referent="RBX4"><Properties><bool name="Archivable">true</bool><string name="Name">Offer</string></Properties></Item><Item class="RemoteEvent" referent="RBX5"><Properties><bool name="Archivable">true</bool><string name="Name">FX</string></Properties></Item></Item></Item><Item class="ServerScriptService" referent="RBX16"><Properties><bool name="Archivable">true</bool><string name="Name">ServerScriptService</string></Properties><Item class="ModuleScript" referent="RBX10"><Properties><bool name="Archivable">true</bool><bool name="Disabled">false</bool><ProtectedString name="Source">-- Everything the player looks at.
 --
--- Art direction: a dark medieval kingdom. Zone 1 is a walled village gone to ruin,
--- zone 2 is the keep behind its gate. Original geometry in that genre, built from
--- parametric pieces (walls, towers, houses, roofs) rather than one authored blob.
+-- Art direction: dark stylised anime. Cold charcoal/indigo world, warm fire accents,
+-- heavy contrast, soft glow. Zone 1 is a fallen walled town, zone 2 the keep behind it.
 --
--- Two rules drive the layout:
---   1. Nothing glows that is not fire. Stone is stone; light comes from lamps.
---   2. You must not be able to see the whole map from the gate. Buildings break the
---      sightlines, the wall hides the outside, and the fog closes in at 70 studs.
+-- On geometry: there is no Blender step here, so nothing is a .fbx MeshPart. Curvature
+-- comes from Roblox's own smooth primitives instead - WedgePart and CornerWedgePart for
+-- every roof and spire, SpecialMesh cylinders for towers and columns, spheres for caps.
+-- Faceted low-poly is the target, not bevelled organic; a real mesh pipeline would need
+-- Blender plus an asset upload.
+--
+-- Rules:
+--   1. Structural surfaces are SmoothPlastic. No Concrete, Slate or Brick noise.
+--   2. Glow is Glass/Neon at 0.6-0.85 transparency, never an opaque bright slab.
+--   3. Small detail never casts a shadow; jagged shadow maps are what read as cheap.
+--   4. You must not see the whole map from the gate.
 
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -291,26 +304,84 @@ local FLOOR_Y = 1.5
 
 local signBoards = {}
 
-local function makePart(parent, name, size, cframe, color, material)
-	local part = Instance.new("Part")
+local function mix(a, b, t)
+	return Color3.new(a.R + (b.R - a.R) * t, a.G + (b.G - a.G) * t, a.B + (b.B - a.B) * t)
+end
+
+local function shape(parent, className, name, size, cframe, color, material)
+	local part = Instance.new(className)
 	part.Name = name
 	part.Size = size
 	part.CFrame = cframe
 	part.Anchored = true
 	part.Color = color
-	part.Material = material or Enum.Material.Slate
+	part.Material = material or Enum.Material.SmoothPlastic
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.Parent = parent
 	return part
 end
 
+local function makePart(parent, name, size, cframe, color, material)
+	return shape(parent, "Part", name, size, cframe, color, material)
+end
+
+-- Detail: no collision, no query, and crucially no shadow.
 local function decor(parent, name, size, cframe, color, material)
 	local part = makePart(parent, name, size, cframe, color, material)
 	part.CanCollide = false
 	part.CanQuery = false
 	part.CanTouch = false
 	part.CastShadow = false
+	return part
+end
+
+local function wedge(parent, name, size, cframe, color, material, solid)
+	local part = shape(parent, "WedgePart", name, size, cframe, color, material)
+	if not solid then
+		part.CanCollide = false
+		part.CanQuery = false
+		part.CastShadow = false
+	end
+	return part
+end
+
+local function cornerWedge(parent, name, size, cframe, color, material)
+	local part = shape(parent, "CornerWedgePart", name, size, cframe, color, material)
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CastShadow = false
+	return part
+end
+
+-- A real cylinder, not a box pretending. SpecialMesh keeps the axis upright.
+local function cylinder(parent, name, diameter, height, cframe, color, material, solid)
+	local part = makePart(parent, name, Vector3.new(diameter, height, diameter), cframe, color, material)
+	local mesh = Instance.new("SpecialMesh")
+	mesh.MeshType = Enum.MeshType.Cylinder
+	mesh.Scale = Vector3.new(1, 1, 1)
+	mesh.Parent = part
+	if not solid then
+		part.CanCollide = false
+		part.CanQuery = false
+		part.CastShadow = false
+	end
+	return part
+end
+
+local function sphere(parent, name, diameter, cframe, color, material)
+	local part = makePart(parent, name, Vector3.new(diameter, diameter, diameter), cframe, color, material)
+	part.Shape = Enum.PartType.Ball
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CastShadow = false
+	return part
+end
+
+-- Glow is always translucent. An opaque Neon slab is the whiteout mistake.
+local function glow(parent, name, size, cframe, color, transparency, material)
+	local part = decor(parent, name, size, cframe, color, material or Enum.Material.Neon)
+	part.Transparency = transparency or 0.72
 	return part
 end
 
@@ -322,8 +393,6 @@ local function addLabel(part, text, color, height, maxDistance)
 	billboard.Size = UDim2.fromOffset(240, 44)
 	billboard.StudsOffset = Vector3.new(0, height or 5, 0)
 	billboard.AlwaysOnTop = false
-	-- Deliberately short. Labels visible across the whole map were most of the reason
-	-- every location was known before the player had walked anywhere.
 	billboard.MaxDistance = maxDistance or 90
 	billboard.Parent = part
 	local label = Instance.new("TextLabel")
@@ -332,7 +401,7 @@ local function addLabel(part, text, color, height, maxDistance)
 	label.Text = text
 	label.TextColor3 = color
 	label.TextStrokeTransparency = 0.05
-	label.TextStrokeColor3 = Color3.fromRGB(10, 6, 8)
+	label.TextStrokeColor3 = Color3.fromRGB(8, 6, 12)
 	label.Font = Enum.Font.GothamBlack
 	label.TextScaled = true
 	label.Parent = billboard
@@ -340,28 +409,28 @@ local function addLabel(part, text, color, height, maxDistance)
 end
 
 -- Lighting ------------------------------------------------------------------
+-- Roughly 70% of the look. Cold desaturated base, punchy contrast, warm glow.
 function World.applyLighting()
-	Lighting.ClockTime = 0.2
+	Lighting.ClockTime = 0.15
 	Lighting.GeographicLatitude = 30
 	Lighting.Brightness = 1.6
 	Lighting.ExposureCompensation = 0.05
-	Lighting.Ambient = Color3.fromRGB(58, 48, 50)
-	Lighting.OutdoorAmbient = Color3.fromRGB(68, 56, 58)
-	Lighting.FogColor = Color3.fromRGB(26, 18, 22)
-	-- The map reveals itself as you walk into it.
+	Lighting.Ambient = Color3.fromRGB(52, 50, 66)
+	Lighting.OutdoorAmbient = Color3.fromRGB(62, 60, 80)
+	Lighting.FogColor = Color3.fromRGB(20, 18, 30)
 	Lighting.FogStart = 70
 	Lighting.FogEnd = 300
 	Lighting.EnvironmentDiffuseScale = 0.25
-	Lighting.EnvironmentSpecularScale = 0.15
+	Lighting.EnvironmentSpecularScale = 0.2
 	Lighting.GlobalShadows = true
 
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
 	atmosphere.Density = 0.34
-	atmosphere.Haze = 2.2
-	atmosphere.Glare = 0.04
-	atmosphere.Offset = 0.1
-	atmosphere.Color = Color3.fromRGB(128, 96, 92)
-	atmosphere.Decay = Color3.fromRGB(40, 24, 28)
+	atmosphere.Haze = 2.4
+	atmosphere.Glare = 0.08
+	atmosphere.Offset = 0.15
+	atmosphere.Color = Color3.fromRGB(116, 110, 148)
+	atmosphere.Decay = Color3.fromRGB(32, 28, 46)
 	atmosphere.Parent = Lighting
 
 	local function effect(className, name, properties)
@@ -371,23 +440,138 @@ function World.applyLighting()
 		instance.Parent = Lighting
 	end
 
-	effect("BloomEffect", "SoulBloom", { Intensity = 0.18, Size = 18, Threshold = 2.5 })
+	-- Low threshold so soul drops, runes and portals bloom the way energy should.
+	effect("BloomEffect", "SoulBloom", { Intensity = 0.55, Size = 30, Threshold = 0.9 })
 	effect("ColorCorrectionEffect", "UnderworldGrade", {
-		Brightness = 0, Contrast = 0.14, Saturation = -0.02, TintColor = Color3.fromRGB(255, 242, 232),
+		Contrast = 0.22, Saturation = -0.2, Brightness = 0, TintColor = Color3.fromRGB(27, 21, 40),
 	})
-	local staleDepth = Lighting:FindFirstChild("SoulDepth")
-	if staleDepth then staleDepth:Destroy() end
+	-- Softens the far silhouette without touching the combat zone: the focus radius is
+	-- wider than any fight, so nothing the player is swinging at is ever blurred.
+	effect("DepthOfFieldEffect", "SoulDepth", {
+		FarIntensity = 0.32, FocusDistance = 60, InFocusRadius = 120, NearIntensity = 0,
+	})
+end
+
+-- Ambience ------------------------------------------------------------------
+
+local function dust(parent, position, color, rate, size)
+	local anchor = decor(parent, "DustAnchor", Vector3.new(1, 1, 1), CFrame.new(position), color, Enum.Material.SmoothPlastic)
+	anchor.Transparency = 1
+	local emitter = Instance.new("ParticleEmitter")
+	emitter.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	emitter.Color = ColorSequence.new(color, mix(color, Color3.new(1, 1, 1), 0.6))
+	emitter.LightEmission = 0.75
+	emitter.Lifetime = NumberRange.new(4, 9)
+	emitter.Rate = rate or 8
+	emitter.Rotation = NumberRange.new(0, 360)
+	emitter.RotSpeed = NumberRange.new(-24, 24)
+	emitter.Size = NumberSequence.new(size or 0.9)
+	emitter.Speed = NumberRange.new(0.6, 2.4)
+	emitter.SpreadAngle = Vector2.new(180, 180)
+	emitter.Transparency = NumberSequence.new(0.35)
+	emitter.Parent = anchor
+	return anchor
+end
+
+-- Ground sigil. Translucent neon ring, never an opaque disc.
+local function runeCircle(parent, position, diameter, color)
+	local ring = cylinder(parent, "RuneCircle", diameter, 0.25, CFrame.new(position + Vector3.new(0, 0.12, 0)), color, Enum.Material.Neon)
+	ring.Transparency = 0.78
+	local inner = cylinder(parent, "RuneInner", diameter * 0.6, 0.25, CFrame.new(position + Vector3.new(0, 0.16, 0)), color, Enum.Material.Neon)
+	inner.Transparency = 0.86
+	for index = 0, 5 do
+		local angle = index * math.pi / 3
+		local mark = glow(parent, "RuneMark", Vector3.new(1.1, 0.2, diameter * 0.34),
+			CFrame.new(position + Vector3.new(math.cos(angle) * diameter * 0.34, 0.2, math.sin(angle) * diameter * 0.34)) * CFrame.Angles(0, -angle, 0),
+			color, 0.7)
+		mark.Material = Enum.Material.Neon
+	end
+end
+
+-- Floating ruin fragments. No shadows, deliberately off-axis.
+local function shards(parent, position, count, color)
+	for index = 1, count or 6 do
+		local angle = index * 1.9
+		local radius = 6 + (index % 3) * 5
+		local size = 1.6 + (index % 4) * 0.9
+		local fragment = decor(parent, "SoulShard", Vector3.new(size, size * 1.6, size * 0.7),
+			CFrame.new(position + Vector3.new(math.cos(angle) * radius, 6 + (index % 5) * 4, math.sin(angle) * radius))
+				* CFrame.Angles(index * 0.7, angle, index * 0.4),
+			color, Enum.Material.Glass)
+		fragment.Transparency = 0.55
+		fragment.Reflectance = 0.15
+	end
 end
 
 -- Pieces --------------------------------------------------------------------
 
+local function pitchedRoof(parent, cf, width, depth, height, color)
+	-- Two wedges back to back. This one change is most of the "not blocky".
+	for side = -1, 1, 2 do
+		wedge(parent, "Roof", Vector3.new(depth, height, width / 2),
+			cf * CFrame.new(side * width / 4, height / 2, 0) * CFrame.Angles(0, side &gt; 0 and math.rad(90) or math.rad(-90), 0),
+			color, Enum.Material.SmoothPlastic)
+	end
+	decor(parent, "RoofRidge", Vector3.new(1.2, 0.8, depth + 1), cf * CFrame.new(0, height, 0), mix(color, palette.Bone, 0.25))
+end
+
+local function pyramidSpire(parent, position, width, height, color)
+	-- Four corner wedges make a clean faceted spire with no stair-stepping.
+	for index = 0, 3 do
+		local angle = index * math.pi / 2
+		cornerWedge(parent, "SpireFace", Vector3.new(width / 2, height, width / 2),
+			CFrame.new(position + Vector3.new(math.cos(angle) * width / 4, height / 2, math.sin(angle) * width / 4)) * CFrame.Angles(0, -angle, 0),
+			color, Enum.Material.SmoothPlastic)
+	end
+	sphere(parent, "SpireFinial", width * 0.22, CFrame.new(position + Vector3.new(0, height + 1, 0)), palette.Gold, Enum.Material.SmoothPlastic)
+end
+
+local function roundTower(parent, position, diameter, height, accent)
+	cylinder(parent, "TowerBase", diameter + 4, 3, CFrame.new(position + Vector3.new(0, 1.5, 0)), palette.StoneDark, Enum.Material.SmoothPlastic, true)
+	-- Three stacked segments with a subtle vertical ramp instead of one flat colour.
+	for tier = 0, 2 do
+		local segment = height / 3
+		cylinder(parent, "TowerShaft", diameter, segment,
+			CFrame.new(position + Vector3.new(0, 3 + segment / 2 + tier * segment, 0)),
+			mix(palette.Rock, palette.SlateLight, tier * 0.22), Enum.Material.SmoothPlastic, true)
+	end
+	cylinder(parent, "TowerBand", diameter + 2, 1.4, CFrame.new(position + Vector3.new(0, 3 + height * 0.62, 0)), palette.StoneDark)
+	cylinder(parent, "TowerCrown", diameter + 3.4, 2.2, CFrame.new(position + Vector3.new(0, height + 4, 0)), palette.StoneDark)
+
+	for index = 0, 7 do
+		local angle = index * math.pi / 4
+		decor(parent, "Merlon", Vector3.new(2.6, 3, 2.6),
+			CFrame.new(position + Vector3.new(math.cos(angle) * (diameter / 2 + 1), height + 6.5, math.sin(angle) * (diameter / 2 + 1))) * CFrame.Angles(0, -angle, 0),
+			palette.Rock)
+	end
+	pyramidSpire(parent, position + Vector3.new(0, height + 7.5, 0), diameter + 3, diameter * 1.5, palette.Roof)
+
+	-- Arrow slits glow faintly from within.
+	for index = 0, 3 do
+		local angle = index * math.pi / 2
+		glow(parent, "SlitGlow", Vector3.new(0.9, 4.5, 0.6),
+			CFrame.new(position + Vector3.new(math.cos(angle) * (diameter / 2), height * 0.55, math.sin(angle) * (diameter / 2))) * CFrame.Angles(0, -angle, 0),
+			accent or palette.Amber, 0.62)
+	end
+end
+
+local function column(parent, position, diameter, height)
+	cylinder(parent, "ColumnBase", diameter + 1.8, 1.6, CFrame.new(position + Vector3.new(0, 0.8, 0)), palette.StoneDark, Enum.Material.SmoothPlastic, true)
+	cylinder(parent, "ColumnShaft", diameter, height, CFrame.new(position + Vector3.new(0, height / 2 + 1.6, 0)), palette.Stone, Enum.Material.SmoothPlastic, true)
+	cylinder(parent, "ColumnCap", diameter + 2, 1.8, CFrame.new(position + Vector3.new(0, height + 2.4, 0)), palette.StoneDark)
+	sphere(parent, "ColumnFinial", diameter * 0.7, CFrame.new(position + Vector3.new(0, height + 4, 0)), palette.SlateLight)
+end
+
 local function lamp(parent, position, height)
 	height = height or 9
-	makePart(parent, "LampPost", Vector3.new(0.7, height, 0.7), CFrame.new(position + Vector3.new(0, height / 2, 0)), palette.Iron, Enum.Material.Metal)
-	decor(parent, "LampArm", Vector3.new(2.2, 0.4, 0.4), CFrame.new(position + Vector3.new(0.8, height, 0)), palette.Iron, Enum.Material.Metal)
-	local cage = decor(parent, "LampCage", Vector3.new(1.5, 2, 1.5), CFrame.new(position + Vector3.new(1.6, height - 1, 0)), palette.Iron, Enum.Material.Metal)
-	cage.Transparency = 0.5
-	local flame = decor(parent, "LampFlame", Vector3.new(0.9, 1.1, 0.9), cage.CFrame, palette.Ember, Enum.Material.Neon)
+	cylinder(parent, "LampPost", 0.7, height, CFrame.new(position + Vector3.new(0, height / 2, 0)), palette.Iron, Enum.Material.SmoothPlastic, true)
+	decor(parent, "LampArm", Vector3.new(2.2, 0.35, 0.35), CFrame.new(position + Vector3.new(0.9, height, 0)), palette.Iron)
+	local cage = sphere(parent, "LampCage", 2.1, CFrame.new(position + Vector3.new(1.7, height - 0.9, 0)), palette.Amber, Enum.Material.Glass)
+	cage.Transparency = 0.68
+	cage.Reflectance = 0.1
+	local flame = sphere(parent, "LampFlame", 1.1, cage.CFrame, palette.Amber, Enum.Material.Neon)
+	flame.Transparency = 0.25
+
 	local light = Instance.new("PointLight")
 	light.Color = Color3.fromRGB(255, 176, 104)
 	light.Brightness = 1.9
@@ -396,11 +580,11 @@ local function lamp(parent, position, height)
 	light.Parent = flame
 end
 
-local function brazier(parent, position)
-	makePart(parent, "BrazierColumn", Vector3.new(1.8, 4.5, 1.8), CFrame.new(position + Vector3.new(0, 2.25, 0)), palette.StoneDark, Enum.Material.Marble)
-	makePart(parent, "BrazierBowl", Vector3.new(3.4, 1.3, 3.4), CFrame.new(position + Vector3.new(0, 5.1, 0)), palette.Iron, Enum.Material.Metal)
-	local flame = decor(parent, "BrazierFlame", Vector3.new(2.2, 2.2, 2.2), CFrame.new(position + Vector3.new(0, 6.3, 0)), palette.Ember, Enum.Material.Neon)
-	flame.Shape = Enum.PartType.Ball
+local function brazier(parent, position, accent)
+	cylinder(parent, "BrazierColumn", 1.8, 4.5, CFrame.new(position + Vector3.new(0, 2.25, 0)), palette.StoneDark, Enum.Material.SmoothPlastic, true)
+	cylinder(parent, "BrazierBowl", 3.6, 1.4, CFrame.new(position + Vector3.new(0, 5.1, 0)), palette.Iron, Enum.Material.SmoothPlastic, true)
+	local flame = sphere(parent, "BrazierFlame", 2.4, CFrame.new(position + Vector3.new(0, 6.4, 0)), accent or palette.Ember, Enum.Material.Neon)
+	flame.Transparency = 0.3
 
 	local light = Instance.new("PointLight")
 	light.Color = Color3.fromRGB(255, 166, 92)
@@ -411,8 +595,8 @@ local function brazier(parent, position)
 
 	local fire = Instance.new("ParticleEmitter")
 	fire.Texture = "rbxasset://textures/particles/fire_main.dds"
-	fire.Color = ColorSequence.new(palette.GoldPale, palette.CrimsonMid)
-	fire.LightEmission = 0.9
+	fire.Color = ColorSequence.new(palette.GoldPale, accent or palette.CrimsonMid)
+	fire.LightEmission = 1
 	fire.Lifetime = NumberRange.new(0.45, 0.85)
 	fire.Rate = 26
 	fire.Size = NumberSequence.new(3)
@@ -421,7 +605,7 @@ local function brazier(parent, position)
 	fire.Parent = flame
 end
 
--- A wall run with real battlements. Merlons are what make stone read as fortification.
+-- Wall with a vertical colour ramp, a smooth coping and wedge-capped merlons.
 local function wallRun(parent, from, to, height, thickness)
 	height = height or 22
 	thickness = thickness or 6
@@ -430,96 +614,75 @@ local function wallRun(parent, from, to, height, thickness)
 	if length &lt; 1 then return end
 	local mid = from + delta * 0.5
 	local angle = math.atan2(delta.X, delta.Z)
-	local cf = CFrame.new(mid + Vector3.new(0, height / 2, 0)) * CFrame.Angles(0, angle, 0)
+	local base = CFrame.new(mid) * CFrame.Angles(0, angle, 0)
 
-	makePart(parent, "CurtainWall", Vector3.new(thickness, height, length), cf, palette.Rock, Enum.Material.Brick)
-	decor(parent, "WallLedge", Vector3.new(thickness + 1.6, 1, length), cf * CFrame.new(0, height / 2 - 0.5, 0), palette.StoneDark, Enum.Material.Marble)
+	for tier = 0, 2 do
+		local segment = height / 3
+		local body = shape(parent, "Part", "CurtainWall", Vector3.new(thickness, segment, length),
+			base * CFrame.new(0, segment / 2 + tier * segment, 0),
+			mix(palette.Obsidian, palette.Slate, 0.25 + tier * 0.3), Enum.Material.SmoothPlastic)
+		body.CastShadow = tier &gt; 0
+	end
+	decor(parent, "WallCoping", Vector3.new(thickness + 1.8, 1, length), base * CFrame.new(0, height, 0), palette.SlateLight)
 
 	local merlons = math.max(2, math.floor(length / 7))
 	for index = 0, merlons do
 		local along = -length / 2 + index * (length / merlons)
-		decor(parent, "Merlon", Vector3.new(thickness, 3.4, 3), cf * CFrame.new(0, height / 2 + 1.7, along), palette.Rock, Enum.Material.Brick)
-	end
-end
-
-local function tower(parent, position, width, height, withRoof)
-	width = width or 14
-	height = height or 34
-	makePart(parent, "TowerBase", Vector3.new(width + 3, 3, width + 3), CFrame.new(position + Vector3.new(0, 1.5, 0)), palette.StoneDark, Enum.Material.Marble)
-	makePart(parent, "TowerShaft", Vector3.new(width, height, width), CFrame.new(position + Vector3.new(0, height / 2 + 2, 0)), palette.Rock, Enum.Material.Brick)
-	decor(parent, "TowerBand", Vector3.new(width + 1.6, 1.2, width + 1.6), CFrame.new(position + Vector3.new(0, height * 0.62, 0)), palette.StoneDark, Enum.Material.Marble)
-	decor(parent, "TowerCrown", Vector3.new(width + 3, 1.6, width + 3), CFrame.new(position + Vector3.new(0, height + 2.8, 0)), palette.StoneDark, Enum.Material.Marble)
-
-	for side = 0, 3 do
-		local angle = side * math.pi / 2
-		local offset = Vector3.new(math.sin(angle) * (width / 2), height + 5, math.cos(angle) * (width / 2))
-		decor(parent, "Merlon", Vector3.new(width * 0.9, 3, 2.4), CFrame.new(position + offset) * CFrame.Angles(0, angle, 0), palette.Rock, Enum.Material.Brick)
-	end
-
-	if withRoof then
-		for tier = 1, 5 do
-			local scale = (width + 4) * (1 - tier / 6)
-			decor(parent, "TowerRoof", Vector3.new(scale, 2.6, scale), CFrame.new(position + Vector3.new(0, height + 5 + tier * 2.4, 0)), palette.CrimsonDeep, Enum.Material.Slate)
+		local merlon = decor(parent, "Merlon", Vector3.new(thickness, 3, 2.8), base * CFrame.new(0, height + 2, along), palette.Slate)
+		-- Wedge caps stop the battlements reading as a row of cubes.
+		for side = -1, 1, 2 do
+			wedge(parent, "MerlonCap", Vector3.new(2.8, 1.4, thickness / 2),
+				base * CFrame.new(side * thickness / 4, height + 4.2, along) * CFrame.Angles(0, side &gt; 0 and 0 or math.rad(180), 0),
+				palette.SlateLight)
 		end
+		merlon.Name = "Merlon"
 	end
-
-	-- Arrow slits read as windows without needing glass.
-	for side = -1, 1, 2 do
-		decor(parent, "ArrowSlit", Vector3.new(0.8, 4, 0.5), CFrame.new(position + Vector3.new(side * (width / 2 + 0.1), height * 0.55, 0)), Color3.fromRGB(16, 10, 12), Enum.Material.Slate)
-	end
-	return position + Vector3.new(0, height + 2, 0)
 end
 
--- Timber-framed house: stone base, plaster upper, pitched roof, door, shutters.
 local function house(parent, cf, width, depth, height, ruined)
 	width = width or 18
 	depth = depth or 16
 	height = height or 14
 
-	makePart(parent, "HouseBase", Vector3.new(width, 4, depth), cf * CFrame.new(0, 2, 0), palette.Rock, Enum.Material.Cobblestone)
-	local body = makePart(parent, "HouseWall", Vector3.new(width - 1, height, depth - 1), cf * CFrame.new(0, 4 + height / 2, 0), palette.Plaster, Enum.Material.Concrete)
+	makePart(parent, "HouseBase", Vector3.new(width, 4, depth), cf * CFrame.new(0, 2, 0), palette.StoneDark)
+	makePart(parent, "HouseWall", Vector3.new(width - 1, height, depth - 1), cf * CFrame.new(0, 4 + height / 2, 0), palette.Plaster)
+	-- Upper storey slightly lighter: a hand-painted ramp rather than one flat tone.
+	decor(parent, "HouseUpper", Vector3.new(width - 0.6, height * 0.4, depth - 0.6), cf * CFrame.new(0, 4 + height * 0.8, 0), mix(palette.Plaster, palette.SlateLight, 0.35))
 
-	-- Timber framing.
 	for index = -1, 1 do
-		decor(parent, "Timber", Vector3.new(0.8, height, 0.6), cf * CFrame.new(index * (width / 3), 4 + height / 2, depth / 2 - 0.3), palette.Timber, Enum.Material.WoodPlanks)
-		decor(parent, "Timber", Vector3.new(0.8, height, 0.6), cf * CFrame.new(index * (width / 3), 4 + height / 2, -depth / 2 + 0.3), palette.Timber, Enum.Material.WoodPlanks)
+		decor(parent, "Timber", Vector3.new(0.7, height, 0.5), cf * CFrame.new(index * (width / 3), 4 + height / 2, depth / 2 - 0.25), palette.Timber)
+		decor(parent, "Timber", Vector3.new(0.7, height, 0.5), cf * CFrame.new(index * (width / 3), 4 + height / 2, -depth / 2 + 0.25), palette.Timber)
 	end
-	decor(parent, "Timber", Vector3.new(width - 1, 0.9, 0.6), cf * CFrame.new(0, 4 + height, depth / 2 - 0.3), palette.Timber, Enum.Material.WoodPlanks)
 
-	-- Door and shuttered windows.
-	decor(parent, "Door", Vector3.new(4, 7, 0.5), cf * CFrame.new(0, 7.5, depth / 2 - 0.2), palette.Timber, Enum.Material.WoodPlanks)
-	decor(parent, "DoorFrame", Vector3.new(5, 8, 0.4), cf * CFrame.new(0, 7.8, depth / 2 - 0.45), palette.StoneDark, Enum.Material.Marble)
+	decor(parent, "Door", Vector3.new(4, 7, 0.4), cf * CFrame.new(0, 7.5, depth / 2 - 0.2), palette.Timber)
+	wedge(parent, "DoorArch", Vector3.new(0.5, 2.2, 5), cf * CFrame.new(0, 11.2, depth / 2 - 0.2) * CFrame.Angles(0, math.rad(90), 0), palette.StoneDark)
 	for side = -1, 1, 2 do
-		decor(parent, "Window", Vector3.new(3.4, 3.4, 0.4), cf * CFrame.new(side * (width / 4), 4 + height * 0.68, depth / 2 - 0.2), Color3.fromRGB(18, 12, 14), Enum.Material.Slate)
-		decor(parent, "Shutter", Vector3.new(1.6, 3.6, 0.35), cf * CFrame.new(side * (width / 4) + 2.2, 4 + height * 0.68, depth / 2 - 0.35), palette.Timber, Enum.Material.WoodPlanks)
+		-- Lit windows: warm glass, never a bright opaque square.
+		local pane = decor(parent, "Window", Vector3.new(3.2, 3.2, 0.4), cf * CFrame.new(side * (width / 4), 4 + height * 0.68, depth / 2 - 0.2), palette.Amber, Enum.Material.Glass)
+		pane.Transparency = 0.66
+		decor(parent, "Shutter", Vector3.new(1.5, 3.4, 0.3), cf * CFrame.new(side * (width / 4) + 2.2, 4 + height * 0.68, depth / 2 - 0.35), palette.Timber)
 	end
 
-	-- Pitched roof from stacked slabs.
-	local tiers = 6
-	for tier = 1, tiers do
-		local shrink = (tier - 1) / tiers
-		decor(parent, "Roof", Vector3.new(width + 2 - shrink * (width - 2), 1.8, depth + 2), cf * CFrame.new(0, 4 + height + tier * 1.5, 0), palette.Roof, Enum.Material.Slate)
-	end
-	decor(parent, "RoofRidge", Vector3.new(2, 1, depth + 2.4), cf * CFrame.new(0, 4 + height + tiers * 1.5 + 0.9, 0), palette.StoneDark, Enum.Material.Marble)
-
-	local chimney = makePart(parent, "Chimney", Vector3.new(3, 12, 3), cf * CFrame.new(width / 2 - 3, 4 + height + 6, -depth / 4), palette.Rock, Enum.Material.Brick)
-	chimney.CanCollide = false
+	pitchedRoof(parent, cf * CFrame.new(0, 4 + height, 0), width + 2.5, depth + 2.5, height * 0.62, palette.Roof)
+	cylinder(parent, "Chimney", 2.6, 12, cf * CFrame.new(width / 2 - 3, 4 + height + 6, -depth / 4), palette.StoneDark)
 
 	if ruined then
-		-- Knock a corner out so the village reads as fallen, not merely empty.
-		body.Transparency = 0.02
-		decor(parent, "Rubble", Vector3.new(6, 5, 6), cf * CFrame.new(width / 2 - 2, 2.5, -depth / 2 + 2) * CFrame.Angles(0.2, 0.5, 0.3), palette.Rock, Enum.Material.Cobblestone)
-		decor(parent, "Rubble", Vector3.new(4, 3.5, 4), cf * CFrame.new(width / 2 + 3, 1.8, -depth / 2 - 1) * CFrame.Angles(0.4, 0.2, 0.1), palette.StoneDark, Enum.Material.Cobblestone)
+		for index = 1, 3 do
+			decor(parent, "Rubble", Vector3.new(4 + index, 3 + index * 0.6, 4 + index),
+				cf * CFrame.new(width / 2 - 1 + index, 2, -depth / 2 + index * 1.4) * CFrame.Angles(index * 0.3, index * 0.6, index * 0.2),
+				mix(palette.Rock, palette.Charcoal, 0.3))
+		end
 	end
 end
 
 local function marketStall(parent, cf)
-	makePart(parent, "StallCounter", Vector3.new(10, 3.5, 4), cf * CFrame.new(0, 1.75, 0), palette.Timber, Enum.Material.WoodPlanks)
+	makePart(parent, "StallCounter", Vector3.new(10, 3.5, 4), cf * CFrame.new(0, 1.75, 0), palette.Timber)
 	for side = -1, 1, 2 do
-		makePart(parent, "StallPost", Vector3.new(0.7, 9, 0.7), cf * CFrame.new(side * 4.6, 4.5, 0), palette.Timber, Enum.Material.WoodPlanks)
+		cylinder(parent, "StallPost", 0.7, 9, cf * CFrame.new(side * 4.6, 4.5, 0), palette.Timber, Enum.Material.SmoothPlastic, true)
 	end
-	decor(parent, "StallAwning", Vector3.new(12, 0.6, 7), cf * CFrame.new(0, 9.2, 1.4) * CFrame.Angles(math.rad(-12), 0, 0), palette.CrimsonMid, Enum.Material.Fabric)
-	decor(parent, "StallTrim", Vector3.new(12, 0.5, 0.5), cf * CFrame.new(0, 8.6, 4.6), palette.Gold, Enum.Material.Metal)
+	for side = -1, 1, 2 do
+		wedge(parent, "StallAwning", Vector3.new(7, 2.4, 6), cf * CFrame.new(side * 3, 9.6, 1.4) * CFrame.Angles(0, side &gt; 0 and math.rad(90) or math.rad(-90), 0), palette.CrimsonMid)
+	end
 end
 
 local function props(parent, position, count)
@@ -527,31 +690,30 @@ local function props(parent, position, count)
 		local angle = index * 2.3
 		local offset = Vector3.new(math.cos(angle) * 3.2, 0, math.sin(angle) * 3.2)
 		if index % 2 == 0 then
-			local barrel = makePart(parent, "Barrel", Vector3.new(3, 4, 3), CFrame.new(position + offset + Vector3.new(0, 2, 0)), palette.Timber, Enum.Material.WoodPlanks)
-			barrel.Shape = Enum.PartType.Cylinder
-			barrel.CFrame = CFrame.new(position + offset + Vector3.new(0, 2, 0)) * CFrame.Angles(0, 0, math.rad(90))
-			decor(parent, "BarrelBand", Vector3.new(3.2, 0.4, 3.2), CFrame.new(position + offset + Vector3.new(0, 2, 0)), palette.Iron, Enum.Material.Metal)
+			cylinder(parent, "Barrel", 3, 4, CFrame.new(position + offset + Vector3.new(0, 2, 0)), palette.Timber, Enum.Material.SmoothPlastic, true)
+			cylinder(parent, "BarrelBand", 3.2, 0.4, CFrame.new(position + offset + Vector3.new(0, 2.6, 0)), palette.Iron)
 		else
-			makePart(parent, "Crate", Vector3.new(3.4, 3.4, 3.4), CFrame.new(position + offset + Vector3.new(0, 1.7, 0)) * CFrame.Angles(0, index * 0.4, 0), palette.Timber, Enum.Material.WoodPlanks)
+			makePart(parent, "Crate", Vector3.new(3.4, 3.4, 3.4), CFrame.new(position + offset + Vector3.new(0, 1.7, 0)) * CFrame.Angles(0, index * 0.4, 0), palette.Timber)
 		end
 	end
 end
 
 local function well(parent, position)
-	makePart(parent, "WellRing", Vector3.new(9, 4, 9), CFrame.new(position + Vector3.new(0, 2, 0)), palette.Rock, Enum.Material.Cobblestone)
-	decor(parent, "WellWater", Vector3.new(7, 0.4, 7), CFrame.new(position + Vector3.new(0, 3.6, 0)), Color3.fromRGB(20, 16, 20), Enum.Material.Slate)
+	cylinder(parent, "WellRing", 9, 4, CFrame.new(position + Vector3.new(0, 2, 0)), palette.Stone, Enum.Material.SmoothPlastic, true)
+	local water = cylinder(parent, "WellWater", 7, 0.4, CFrame.new(position + Vector3.new(0, 3.7, 0)), palette.Indigo, Enum.Material.Glass)
+	water.Transparency = 0.5
+	water.Reflectance = 0.3
 	for side = -1, 1, 2 do
-		makePart(parent, "WellPost", Vector3.new(0.8, 9, 0.8), CFrame.new(position + Vector3.new(side * 4, 8, 0)), palette.Timber, Enum.Material.WoodPlanks)
+		cylinder(parent, "WellPost", 0.8, 9, CFrame.new(position + Vector3.new(side * 4, 8, 0)), palette.Timber, Enum.Material.SmoothPlastic, true)
 	end
-	decor(parent, "WellBeam", Vector3.new(10, 0.9, 0.9), CFrame.new(position + Vector3.new(0, 12.4, 0)), palette.Timber, Enum.Material.WoodPlanks)
-	decor(parent, "WellRoof", Vector3.new(11, 0.8, 8), CFrame.new(position + Vector3.new(0, 13.2, 0)), palette.Roof, Enum.Material.Slate)
-	decor(parent, "WellBucket", Vector3.new(2, 2, 2), CFrame.new(position + Vector3.new(0, 9.6, 0)), palette.Timber, Enum.Material.WoodPlanks)
+	decor(parent, "WellBeam", Vector3.new(10, 0.8, 0.8), CFrame.new(position + Vector3.new(0, 12.4, 0)), palette.Timber)
+	pitchedRoof(parent, CFrame.new(position + Vector3.new(0, 12.8, 0)), 11, 8, 4, palette.Roof)
 end
 
 local function banner(parent, cf, height)
-	decor(parent, "Banner", Vector3.new(5, height or 16, 0.3), cf, palette.CrimsonMid, Enum.Material.Fabric)
-	decor(parent, "BannerHem", Vector3.new(5.2, 0.8, 0.45), cf * CFrame.new(0, -(height or 16) / 2, 0), palette.Gold, Enum.Material.Metal)
-	decor(parent, "BannerRod", Vector3.new(6, 0.5, 0.5), cf * CFrame.new(0, (height or 16) / 2 + 0.4, 0), palette.Iron, Enum.Material.Metal)
+	decor(parent, "Banner", Vector3.new(5, height or 16, 0.25), cf, palette.CrimsonMid, Enum.Material.SmoothPlastic)
+	wedge(parent, "BannerTail", Vector3.new(0.3, 2.4, 5), cf * CFrame.new(0, -(height or 16) / 2 - 1.2, 0) * CFrame.Angles(0, math.rad(90), 0), palette.CrimsonMid)
+	decor(parent, "BannerRod", Vector3.new(6, 0.4, 0.4), cf * CFrame.new(0, (height or 16) / 2 + 0.4, 0), palette.Iron)
 end
 
 local function cobbleRoad(parent, from, to, width)
@@ -560,32 +722,31 @@ local function cobbleRoad(parent, from, to, width)
 	if length &lt; 1 then return end
 	local mid = from + delta * 0.5
 	local angle = math.atan2(delta.X, delta.Z)
-	decor(parent, "Cobble", Vector3.new(width or 22, 0.5, length), CFrame.new(mid + Vector3.new(0, FLOOR_Y, 0)) * CFrame.Angles(0, angle, 0), palette.Cobble, Enum.Material.Cobblestone)
+	local cf = CFrame.new(mid + Vector3.new(0, FLOOR_Y, 0)) * CFrame.Angles(0, angle, 0)
+	decor(parent, "Cobble", Vector3.new(width or 22, 0.5, length), cf, palette.Cobble)
 	for side = -1, 1, 2 do
-		decor(parent, "Kerb", Vector3.new(1.6, 1, length), CFrame.new(mid + Vector3.new(0, FLOOR_Y + 0.3, 0)) * CFrame.Angles(0, angle, 0) * CFrame.new(side * ((width or 22) / 2), 0, 0), palette.StoneDark, Enum.Material.Cobblestone)
+		decor(parent, "Kerb", Vector3.new(1.4, 0.9, length), cf * CFrame.new(side * ((width or 22) / 2), 0.2, 0), palette.StoneDark)
 	end
 end
 
--- The sign the whole quest system writes to.
 local function signPost(parent, cframe, heading, body)
-	makePart(parent, "SignPost", Vector3.new(1.4, 10, 1.4), cframe * CFrame.new(0, 5, 0), palette.Timber, Enum.Material.WoodPlanks)
-	local board = makePart(parent, "SignBoard", Vector3.new(20, 11, 1), cframe * CFrame.new(0, 13, 0), palette.Timber, Enum.Material.WoodPlanks)
-	decor(parent, "SignFrame", Vector3.new(21.4, 12.4, 0.6), cframe * CFrame.new(0, 13, -0.3), palette.Iron, Enum.Material.Metal)
+	cylinder(parent, "SignPost", 1.4, 10, cframe * CFrame.new(0, 5, 0), palette.Timber, Enum.Material.SmoothPlastic, true)
+	local board = makePart(parent, "SignBoard", Vector3.new(20, 11, 1), cframe * CFrame.new(0, 13, 0), palette.Timber)
+	decor(parent, "SignFrame", Vector3.new(21.4, 12.4, 0.6), cframe * CFrame.new(0, 13, -0.3), palette.Iron)
 
-	-- Both faces carry the text, so the sign reads from either side of the road.
 	for _, face in { Enum.NormalId.Front, Enum.NormalId.Back } do
 		local surface = Instance.new("SurfaceGui")
 		surface.Name = "SignFace"
 		surface.Face = face
 		surface.CanvasSize = Vector2.new(640, 352)
-		-- Zero light influence: in a night map, a lit SurfaceGui is an unreadable one.
+		-- Zero light influence: on a night map a lit SurfaceGui is an unreadable one.
 		surface.LightInfluence = 0
 		surface.MaxDistance = 260
 		surface.Parent = board
 
 		local backing = Instance.new("Frame")
 		backing.Size = UDim2.fromScale(1, 1)
-		backing.BackgroundColor3 = Color3.fromRGB(24, 15, 16)
+		backing.BackgroundColor3 = Color3.fromRGB(20, 16, 26)
 		backing.BorderSizePixel = 0
 		backing.Parent = surface
 
@@ -618,7 +779,7 @@ local function signPost(parent, cframe, heading, body)
 		detail.Position = UDim2.fromOffset(20, 124)
 		detail.BackgroundTransparency = 1
 		detail.Font = Enum.Font.GothamMedium
-		detail.TextColor3 = Color3.fromRGB(240, 228, 212)
+		detail.TextColor3 = Color3.fromRGB(238, 232, 244)
 		detail.TextSize = 34
 		detail.TextWrapped = true
 		detail.TextYAlignment = Enum.TextYAlignment.Top
@@ -628,7 +789,8 @@ local function signPost(parent, cframe, heading, body)
 		table.insert(signBoards, { Heading = title, Body = detail, Board = board })
 	end
 
-	local lantern = decor(parent, "SignLantern", Vector3.new(1.4, 1.8, 1.4), cframe * CFrame.new(0, 19.6, 0), palette.Ember, Enum.Material.Neon)
+	local lantern = sphere(parent, "SignLantern", 1.8, cframe * CFrame.new(0, 19.6, 0), palette.Amber, Enum.Material.Neon)
+	lantern.Transparency = 0.3
 	local light = Instance.new("PointLight")
 	light.Color = Color3.fromRGB(255, 190, 120)
 	light.Brightness = 1.6
@@ -643,8 +805,7 @@ function World.setObjective(heading, body)
 	end
 end
 
--- Backdrop: a far ridge only. The old spire ring put scenery everywhere and was part
--- of why the whole map was legible from the spawn.
+-- Backdrop: faceted monoliths, softened by fog and depth of field.
 local function buildBackdrop(parent, center)
 	local folder = Instance.new("Folder")
 	folder.Name = "Backdrop"
@@ -653,15 +814,16 @@ local function buildBackdrop(parent, center)
 		local angle = index * math.pi * 2 / 20
 		local radius = 900 + (index % 3) * 220
 		local height = 420 + (index % 5) * 190
+		local position = center + Vector3.new(math.cos(angle) * radius, height / 2 - 140, math.sin(angle) * radius)
 		local ridge = decor(folder, "FarRidge", Vector3.new(300, height, 300),
-			CFrame.new(center + Vector3.new(math.cos(angle) * radius, height / 2 - 140, math.sin(angle) * radius))
-				* CFrame.Angles(0, angle, math.rad((index % 3) * 4)),
-			palette.Bedrock, Enum.Material.Basalt)
+			CFrame.new(position) * CFrame.Angles(0, angle, math.rad((index % 3) * 4)),
+			mix(palette.Bedrock, palette.Indigo, (index % 4) * 0.15))
 		ridge.CastShadow = false
+		pyramidSpire(folder, position + Vector3.new(0, height / 2, 0), 300, 220, mix(palette.Obsidian, palette.Indigo, 0.4))
 	end
 end
 
--- Zone 1: the village ---------------------------------------------------------
+-- Zone 1: the fallen town ------------------------------------------------------
 
 local function buildVillage(zone, world)
 	local folder = Instance.new("Folder")
@@ -669,82 +831,82 @@ local function buildVillage(zone, world)
 	folder.Parent = world
 	local origin = zone.Origin
 
-	makePart(folder, "Bedrock", Vector3.new(HALF.X * 2 + 60, 14, HALF.Z * 2 + 60), CFrame.new(origin - Vector3.new(0, 7, 0)), palette.Bedrock, Enum.Material.Basalt)
-	makePart(folder, "ArenaFloor", Vector3.new(HALF.X * 2, 3, HALF.Z * 2), CFrame.new(origin), zone.Floor, Enum.Material.Ground)
+	makePart(folder, "Bedrock", Vector3.new(HALF.X * 2 + 60, 14, HALF.Z * 2 + 60), CFrame.new(origin - Vector3.new(0, 7, 0)), palette.Bedrock)
+	makePart(folder, "ArenaFloor", Vector3.new(HALF.X * 2, 3, HALF.Z * 2), CFrame.new(origin), zone.Floor)
 
-	-- Main street running north from the gate, with a fork at the market.
 	cobbleRoad(folder, origin + Vector3.new(0, 0, HALF.Z - 24), origin + Vector3.new(0, 0, -HALF.Z + 40), 24)
 	cobbleRoad(folder, origin + Vector3.new(-HALF.X + 40, 0, 6), origin + Vector3.new(HALF.X - 40, 0, 6), 18)
 
-	-- Curtain wall with corner and mid towers.
 	local cx, cz = HALF.X - 6, HALF.Z - 6
 	local corners = {
 		origin + Vector3.new(-cx, FLOOR_Y, -cz), origin + Vector3.new(cx, FLOOR_Y, -cz),
 		origin + Vector3.new(cx, FLOOR_Y, cz), origin + Vector3.new(-cx, FLOOR_Y, cz),
 	}
 	for index = 1, 4 do
-		local from = corners[index]
-		local to = corners[index % 4 + 1]
-		-- Leave a gap in the south wall for the gatehouse.
+		local from, to = corners[index], corners[index % 4 + 1]
 		if index == 3 then
 			wallRun(folder, from, origin + Vector3.new(22, FLOOR_Y, cz), 24, 7)
 			wallRun(folder, origin + Vector3.new(-22, FLOOR_Y, cz), to, 24, 7)
 		else
 			wallRun(folder, from, to, 24, 7)
 		end
-		tower(folder, from, 16, 38, true)
+		roundTower(folder, from, 16, 34, palette.Amber)
 	end
-	tower(folder, origin + Vector3.new(-cx, FLOOR_Y, 0), 14, 32, true)
-	tower(folder, origin + Vector3.new(cx, FLOOR_Y, 0), 14, 32, true)
+	roundTower(folder, origin + Vector3.new(-cx, FLOOR_Y, 0), 14, 30, palette.Amber)
+	roundTower(folder, origin + Vector3.new(cx, FLOOR_Y, 0), 14, 30, palette.Amber)
 
-	-- Gatehouse the player walks in through.
+	-- Gatehouse.
 	local gatePos = origin + Vector3.new(0, FLOOR_Y, cz)
 	for side = -1, 1, 2 do
-		tower(folder, gatePos + Vector3.new(side * 22, 0, 0), 16, 40, true)
-		banner(folder, CFrame.new(gatePos + Vector3.new(side * 22, 26, -8.2)), 18)
+		roundTower(folder, gatePos + Vector3.new(side * 22, 0, 0), 16, 36, palette.CrimsonLit)
+		banner(folder, CFrame.new(gatePos + Vector3.new(side * 22, 26, -9.2)), 18)
 	end
-	makePart(folder, "GateArch", Vector3.new(44, 10, 12), CFrame.new(gatePos + Vector3.new(0, 30, 0)), palette.Rock, Enum.Material.Brick)
-	decor(folder, "GateTrim", Vector3.new(46, 1.6, 13), CFrame.new(gatePos + Vector3.new(0, 35.6, 0)), palette.Gold, Enum.Material.Metal)
+	makePart(folder, "GateArch", Vector3.new(44, 10, 12), CFrame.new(gatePos + Vector3.new(0, 30, 0)), palette.Rock)
+	for side = -1, 1, 2 do
+		wedge(folder, "GateHaunch", Vector3.new(12, 8, 11), CFrame.new(gatePos + Vector3.new(side * 16, 21, 0)) * CFrame.Angles(0, side &gt; 0 and 0 or math.rad(180), 0), palette.Rock)
+	end
 	for bar = -3, 3 do
-		decor(folder, "Portcullis", Vector3.new(0.7, 14, 0.7), CFrame.new(gatePos + Vector3.new(bar * 5, 22, 0)), palette.Iron, Enum.Material.Metal)
+		cylinder(folder, "Portcullis", 0.8, 14, CFrame.new(gatePos + Vector3.new(bar * 5, 22, 0)), palette.Iron)
 	end
 
-	-- Houses down both sides of the street. Gaps between them are alleys, and they are
-	-- what stops the market and the keep gate being visible from the entrance.
-	local rows = { -1, 1 }
-	for _, side in rows do
+	-- Houses and alleys.
+	for _, side in { -1, 1 } do
 		for index = 0, 4 do
 			local z = HALF.Z - 62 - index * 34
 			local jitter = (index % 2) * 4
 			house(folder, CFrame.new(origin + Vector3.new(side * (30 + jitter), FLOOR_Y, z)) * CFrame.Angles(0, side &gt; 0 and math.pi or 0, 0),
 				20 + (index % 3) * 3, 18, 13 + (index % 2) * 4, index % 3 == 0)
-			if index % 2 == 0 then
-				lamp(folder, origin + Vector3.new(side * 15, FLOOR_Y, z + 8))
-			end
+			if index % 2 == 0 then lamp(folder, origin + Vector3.new(side * 15, FLOOR_Y, z + 8)) end
 		end
 	end
 
-	-- Market square at the fork.
+	-- Market square: rune circle, well, stalls, drifting dust.
 	local market = origin + Vector3.new(0, FLOOR_Y, 6)
-	decor(folder, "Plaza", Vector3.new(76, 0.6, 62), CFrame.new(market + Vector3.new(0, 0.3, 0)), palette.Cobble, Enum.Material.Cobblestone)
+	decor(folder, "Plaza", Vector3.new(76, 0.6, 62), CFrame.new(market + Vector3.new(0, 0.3, 0)), palette.Cobble)
+	runeCircle(folder, market + Vector3.new(0, 0.6, 0), 34, palette.CrimsonLit)
 	well(folder, market)
+	shards(folder, market, 8, palette.CrimsonLit)
+	dust(folder, market + Vector3.new(0, 10, 0), palette.Ember, 10, 1.1)
 	for index = -1, 1 do
 		marketStall(folder, CFrame.new(market + Vector3.new(index * 24, 0, -24)))
 		props(folder, market + Vector3.new(index * 22, 0, 20), 4)
 	end
 	for side = -1, 1, 2 do
-		brazier(folder, market + Vector3.new(side * 34, 0, 0))
+		brazier(folder, market + Vector3.new(side * 34, 0, 0), palette.Ember)
 	end
 
-	-- Chapel off the west side, blacksmith off the east.
+	-- Chapel and forge.
 	local chapel = origin + Vector3.new(-72, FLOOR_Y, -40)
 	house(folder, CFrame.new(chapel), 26, 34, 22, false)
-	tower(folder, chapel + Vector3.new(0, 0, -22), 10, 46, true)
+	roundTower(folder, chapel + Vector3.new(0, 0, -24), 11, 42, palette.Amber)
+	for index = -1, 1, 2 do
+		column(folder, chapel + Vector3.new(index * 15, 0, 19), 3, 14)
+	end
 	banner(folder, CFrame.new(chapel + Vector3.new(0, 20, 17.4)), 14)
 
 	local forge = origin + Vector3.new(74, FLOOR_Y, -36)
 	house(folder, CFrame.new(forge) * CFrame.Angles(0, math.rad(180), 0), 24, 20, 14, false)
-	local coals = decor(folder, "ForgeCoals", Vector3.new(6, 0.8, 5), CFrame.new(forge + Vector3.new(0, 1.2, 13)), palette.CrimsonLit, Enum.Material.Neon)
+	local coals = glow(folder, "ForgeCoals", Vector3.new(6, 0.8, 5), CFrame.new(forge + Vector3.new(0, 1.2, 13)), palette.CrimsonLit, 0.35)
 	local forgeLight = Instance.new("PointLight")
 	forgeLight.Color = Color3.fromRGB(255, 120, 60)
 	forgeLight.Brightness = 2.2
@@ -752,21 +914,15 @@ local function buildVillage(zone, world)
 	forgeLight.Parent = coals
 	props(folder, forge + Vector3.new(-12, 0, 12), 3)
 
-	-- Street lamps along the main road.
 	for index = -2, 2 do
 		for side = -1, 1, 2 do
 			lamp(folder, origin + Vector3.new(side * 14, FLOOR_Y, index * 36 - 20))
 		end
+		banner(folder, CFrame.new(origin + Vector3.new(index * 46, 16, -cz + 4.6)), 14)
+		banner(folder, CFrame.new(origin + Vector3.new(-cx + 4.6, 16, index * 40)) * CFrame.Angles(0, math.rad(90), 0), 14)
 	end
 
-	-- Colours hung along the inner wall faces. A walled town without banners reads as
-	-- a quarry with a fence around it.
-	for index = -2, 2 do
-		banner(folder, CFrame.new(origin + Vector3.new(index * 46, 16, -cz + 4.2)), 14)
-		banner(folder, CFrame.new(origin + Vector3.new(-cx + 4.2, 16, index * 40)) * CFrame.Angles(0, math.rad(90), 0), 14)
-	end
-
-	-- Signs: one inside the gatehouse, one in the market.
+	dust(folder, origin + Vector3.new(0, 18, -60), palette.Indigo, 6, 1.4)
 	signPost(folder, CFrame.new(origin + Vector3.new(-18, FLOOR_Y, cz - 26)), "OBJECTIVE", "Loading your charge...")
 	signPost(folder, CFrame.new(market + Vector3.new(26, 0, 22)) * CFrame.Angles(0, math.rad(-35), 0), "OBJECTIVE", "Loading your charge...")
 
@@ -781,8 +937,8 @@ local function buildKeep(zone, world)
 	folder.Parent = world
 	local origin = zone.Origin
 
-	makePart(folder, "Bedrock", Vector3.new(HALF.X * 2 + 60, 14, HALF.Z * 2 + 60), CFrame.new(origin - Vector3.new(0, 7, 0)), palette.Bedrock, Enum.Material.Basalt)
-	makePart(folder, "ArenaFloor", Vector3.new(HALF.X * 2, 3, HALF.Z * 2), CFrame.new(origin), zone.Floor, Enum.Material.Cobblestone)
+	makePart(folder, "Bedrock", Vector3.new(HALF.X * 2 + 60, 14, HALF.Z * 2 + 60), CFrame.new(origin - Vector3.new(0, 7, 0)), palette.Bedrock)
+	makePart(folder, "ArenaFloor", Vector3.new(HALF.X * 2, 3, HALF.Z * 2), CFrame.new(origin), zone.Floor)
 
 	local cx, cz = HALF.X - 6, HALF.Z - 6
 	local corners = {
@@ -790,56 +946,53 @@ local function buildKeep(zone, world)
 		origin + Vector3.new(cx, FLOOR_Y, cz), origin + Vector3.new(-cx, FLOOR_Y, cz),
 	}
 	for index = 1, 4 do
-		local from = corners[index]
-		local to = corners[index % 4 + 1]
+		local from, to = corners[index], corners[index % 4 + 1]
 		if index == 3 then
 			wallRun(folder, from, origin + Vector3.new(20, FLOOR_Y, cz), 30, 8)
 			wallRun(folder, origin + Vector3.new(-20, FLOOR_Y, cz), to, 30, 8)
 		else
 			wallRun(folder, from, to, 30, 8)
 		end
-		tower(folder, from, 18, 48, true)
+		roundTower(folder, from, 18, 44, palette.CrimsonLit)
 	end
 
 	cobbleRoad(folder, origin + Vector3.new(0, 0, cz - 10), origin + Vector3.new(0, 0, -40), 26)
 
-	-- Inner bailey: barracks flanking the approach.
 	for side = -1, 1, 2 do
 		for index = 0, 2 do
 			house(folder, CFrame.new(origin + Vector3.new(side * 46, FLOOR_Y, 60 - index * 38)) * CFrame.Angles(0, side &gt; 0 and math.pi or 0, 0), 22, 26, 16, false)
 		end
 		lamp(folder, origin + Vector3.new(side * 18, FLOOR_Y, 40))
 		lamp(folder, origin + Vector3.new(side * 18, FLOOR_Y, -4))
-	end
-
-	-- The keep itself, raised on a plinth at the north end.
-	local keepPos = origin + Vector3.new(0, FLOOR_Y, -66)
-	makePart(folder, "KeepPlinth", Vector3.new(120, 6, 76), CFrame.new(keepPos + Vector3.new(0, 3, 0)), palette.StoneDark, Enum.Material.Marble)
-	for step = 1, 5 do
-		makePart(folder, "KeepStair", Vector3.new(44, 1.4, 4), CFrame.new(keepPos + Vector3.new(0, step * 1.2, 40 - step * 3.4)), palette.Stone, Enum.Material.Marble)
-	end
-	makePart(folder, "KeepHall", Vector3.new(84, 46, 52), CFrame.new(keepPos + Vector3.new(0, 29, -8)), palette.Rock, Enum.Material.Brick)
-	decor(folder, "KeepBand", Vector3.new(88, 2, 56), CFrame.new(keepPos + Vector3.new(0, 44, -8)), palette.StoneDark, Enum.Material.Marble)
-	for tier = 1, 7 do
-		decor(folder, "KeepRoof", Vector3.new(88 - tier * 10, 3, 56 - tier * 6), CFrame.new(keepPos + Vector3.new(0, 52 + tier * 2.6, -8)), palette.Roof, Enum.Material.Slate)
-	end
-	for side = -1, 1, 2 do
-		tower(folder, keepPos + Vector3.new(side * 50, 6, -8), 20, 62, true)
-		banner(folder, CFrame.new(keepPos + Vector3.new(side * 22, 30, 18.2)), 24)
-	end
-	decor(folder, "KeepDoor", Vector3.new(16, 22, 1), CFrame.new(keepPos + Vector3.new(0, 17, 18.2)), palette.Timber, Enum.Material.WoodPlanks)
-	decor(folder, "KeepDoorTrim", Vector3.new(18, 24, 0.6), CFrame.new(keepPos + Vector3.new(0, 18, 18.5)), palette.Gold, Enum.Material.Metal)
-
-	-- Boss ground, lit hard so the fight is readable.
-	for side = -1, 1, 2 do
-		brazier(folder, keepPos + Vector3.new(side * 32, 6, 26))
-		brazier(folder, origin + Vector3.new(side * 30, 0, -10))
-	end
-
-	for index = -1, 1 do
-		for side = -1, 1, 2 do
+		for index = -1, 1 do
 			banner(folder, CFrame.new(origin + Vector3.new(side * 34, 22, index * 38 + 20)), 18)
 		end
+	end
+
+	-- The keep, raised on a plinth with a wedge-roofed hall and flanking towers.
+	local keepPos = origin + Vector3.new(0, FLOOR_Y, -66)
+	makePart(folder, "KeepPlinth", Vector3.new(120, 6, 76), CFrame.new(keepPos + Vector3.new(0, 3, 0)), palette.StoneDark)
+	for step = 1, 5 do
+		makePart(folder, "KeepStair", Vector3.new(44, 1.4, 4), CFrame.new(keepPos + Vector3.new(0, step * 1.2, 40 - step * 3.4)), palette.Stone)
+	end
+	for tier = 0, 2 do
+		makePart(folder, "KeepHall", Vector3.new(84, 46 / 3, 52), CFrame.new(keepPos + Vector3.new(0, 6 + 46 / 6 + tier * (46 / 3), -8)),
+			mix(palette.Obsidian, palette.Slate, 0.2 + tier * 0.28))
+	end
+	pitchedRoof(folder, CFrame.new(keepPos + Vector3.new(0, 52, -8)), 88, 56, 26, palette.Roof)
+	for side = -1, 1, 2 do
+		roundTower(folder, keepPos + Vector3.new(side * 50, 6, -8), 20, 56, palette.CrimsonLit)
+		column(folder, keepPos + Vector3.new(side * 26, 6, 20), 4, 20)
+	end
+	local door = glow(folder, "KeepDoor", Vector3.new(16, 22, 1), CFrame.new(keepPos + Vector3.new(0, 17, 18.2)), palette.CrimsonLit, 0.6, Enum.Material.Glass)
+	door.Reflectance = 0.2
+	runeCircle(folder, keepPos + Vector3.new(0, 6.2, 26), 40, palette.Amber)
+	shards(folder, keepPos + Vector3.new(0, 8, 10), 10, palette.Amber)
+	dust(folder, keepPos + Vector3.new(0, 16, 6), palette.CrimsonLit, 12, 1.2)
+
+	for side = -1, 1, 2 do
+		brazier(folder, keepPos + Vector3.new(side * 32, 6, 26), palette.Amber)
+		brazier(folder, origin + Vector3.new(side * 30, 0, -10), palette.Ember)
 	end
 
 	signPost(folder, CFrame.new(origin + Vector3.new(-24, FLOOR_Y, cz - 26)), "OBJECTIVE", "Loading your charge...")
@@ -875,51 +1028,43 @@ function World.build()
 	spawnPad.Anchored = true
 	spawnPad.Neutral = true
 	spawnPad.Color = palette.Cobble
-	spawnPad.Material = Enum.Material.Cobblestone
+	spawnPad.Material = Enum.Material.SmoothPlastic
 	spawnPad.Parent = world
+	runeCircle(world, spawnPosition + Vector3.new(0, 0.7, 0), 22, palette.Amber)
 
-	-- The Ash Gate at the far end of the village. You cannot see it from the spawn.
-	local gatePosition = zoneOne.Origin + Vector3.new(0, FLOOR_Y, -HALF.Z + 26)
-	local veil = makePart(world, "AshGate", Vector3.new(30, 34, 1.4), CFrame.new(gatePosition + Vector3.new(0, 18, 0)), zoneOne.Accent, Enum.Material.ForceField)
-	veil.Transparency = 0.35
-	veil.CanCollide = false
-	for side = -1, 1, 2 do
-		tower(world, gatePosition + Vector3.new(side * 24, 0, 0), 16, 44, true)
+	local function portal(position, accent, title, objectText, actionText, hold)
+		local veil = makePart(world, "GateVeil", Vector3.new(30, 34, 1.4), CFrame.new(position + Vector3.new(0, 18, 0)), accent, Enum.Material.Neon)
+		veil.Transparency = 0.8
+		veil.CanCollide = false
+		veil.CastShadow = false
+		for side = -1, 1, 2 do
+			roundTower(world, position + Vector3.new(side * 24, 0, 0), 16, 40, accent)
+		end
+		makePart(world, "GateLintel", Vector3.new(50, 10, 12), CFrame.new(position + Vector3.new(0, 38, 0)), palette.Rock)
+		runeCircle(world, position + Vector3.new(0, FLOOR_Y, 10), 26, accent)
+		shards(world, position + Vector3.new(0, 4, 0), 6, accent)
+		addLabel(veil, title, palette.GoldPale, 22, 130)
+
+		local light = Instance.new("PointLight")
+		light.Color = accent
+		light.Brightness = 2.2
+		light.Range = 40
+		light.Parent = veil
+
+		local prompt = Instance.new("ProximityPrompt")
+		prompt.ActionText = actionText
+		prompt.ObjectText = objectText
+		prompt.HoldDuration = hold
+		prompt.MaxActivationDistance = 18
+		prompt.RequiresLineOfSight = false
+		prompt.Parent = veil
+		return prompt
 	end
-	makePart(world, "AshGateLintel", Vector3.new(50, 10, 12), CFrame.new(gatePosition + Vector3.new(0, 38, 0)), palette.Rock, Enum.Material.Brick)
-	addLabel(veil, "THE ASH GATE", palette.GoldPale, 22, 130)
-	local gateLight = Instance.new("PointLight")
-	gateLight.Color = zoneOne.Accent
-	gateLight.Brightness = 2.2
-	gateLight.Range = 40
-	gateLight.Parent = veil
 
-	local gatePrompt = Instance.new("ProximityPrompt")
-	gatePrompt.ActionText = "Open the Ash Gate"
-	gatePrompt.ObjectText = "Blackspire Keep"
-	gatePrompt.HoldDuration = 0.4
-	gatePrompt.MaxActivationDistance = 18
-	gatePrompt.RequiresLineOfSight = false
-	gatePrompt.Parent = veil
-
-	local returnPosition = zoneTwo.Origin + Vector3.new(0, FLOOR_Y, HALF.Z - 26)
-	local returnVeil = makePart(world, "ReturnGate", Vector3.new(30, 34, 1.4), CFrame.new(returnPosition + Vector3.new(0, 18, 0)), zoneTwo.Accent, Enum.Material.ForceField)
-	returnVeil.Transparency = 0.35
-	returnVeil.CanCollide = false
-	addLabel(returnVeil, "BACK TO ASHENFALL", palette.GoldPale, 22, 130)
-	local returnLight = Instance.new("PointLight")
-	returnLight.Color = zoneTwo.Accent
-	returnLight.Brightness = 2
-	returnLight.Range = 36
-	returnLight.Parent = returnVeil
-
-	local returnPrompt = Instance.new("ProximityPrompt")
-	returnPrompt.ActionText = "Return"
-	returnPrompt.ObjectText = "Ashenfall Village"
-	returnPrompt.HoldDuration = 0.25
-	returnPrompt.MaxActivationDistance = 18
-	returnPrompt.RequiresLineOfSight = false
-	returnPrompt.Parent = returnVeil
+	local gatePrompt = portal(zoneOne.Origin + Vector3.new(0, FLOOR_Y, -HALF.Z + 26), zoneOne.Accent,
+		"THE ASH GATE", "Blackspire Keep", "Open the Ash Gate", 0.4)
+	local returnPrompt = portal(zoneTwo.Origin + Vector3.new(0, FLOOR_Y, HALF.Z - 26), zoneTwo.Accent,
+		"BACK TO ASHENFALL", "Ashenfall Village", "Return", 0.25)
 
 	return {
 		Folder = world,
@@ -929,7 +1074,6 @@ function World.build()
 	}
 end
 
--- Enemy posts sit in the streets, the market and the bailey, never inside a building.
 function World.posts(zoneId)
 	local village = {
 		Vector3.new(0, FLOOR_Y, 62), Vector3.new(-16, FLOOR_Y, 30), Vector3.new(18, FLOOR_Y, 34),

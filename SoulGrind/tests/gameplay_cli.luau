@@ -73,14 +73,26 @@ band(stub.Lighting.FogStart, 55, 200, "fog start")
 local atmosphere = stub.Lighting:FindFirstChildOfClass("Atmosphere")
 check(atmosphere ~= nil, "the underworld needs an Atmosphere")
 band(atmosphere.Density, 0.15, 0.36, "atmosphere density")
-check(stub.Lighting:FindFirstChild("SoulDepth") == nil, "depth of field blurs the silhouettes players need")
+-- Depth of field is wanted now, but only on the far field. If the in-focus radius ever
+-- shrinks to combat range the player is swinging at a blurred target.
+local depth = stub.Lighting:FindFirstChild("SoulDepth")
+check(depth ~= nil, "the far silhouette needs softening")
+check(depth.InFocusRadius >= 90, `focus radius {depth.InFocusRadius} would blur the fight itself`)
+check(depth.FarIntensity <= 0.5, "far blur this strong turns the backdrop to soup")
+check(depth.NearIntensity == 0, "near blur makes the world swim")
 
+-- A low bloom threshold is the anime glow. It is also how the magenta whiteout happened,
+-- so intensity, exposure, ambient and light density stay capped to hold the line.
 local bloom = stub.Lighting:FindFirstChild("SoulBloom")
-check(bloom ~= nil and bloom.Intensity <= 0.3, "bloom this strong turns every lit edge into a white halo")
-check(bloom.Threshold >= 2, "a low bloom threshold blooms surfaces that are not meant to glow")
+check(bloom ~= nil, "energy needs a bloom pass")
+check(bloom.Threshold <= 1.2, "the glow threshold must be low enough for runes and portals to bloom")
+check(bloom.Intensity <= 0.8, `bloom intensity {bloom.Intensity} will smear the whole frame`)
+
 local grade = stub.Lighting:FindFirstChild("UnderworldGrade")
 check(grade ~= nil and grade.Brightness <= 0.02, "colour grading must not stack more exposure on top")
-check(grade.Saturation <= 0.05, "the palette is already saturated; grading must not push it further")
+band(grade.Contrast, 0.15, 0.30, "grade contrast")
+band(grade.Saturation, -0.30, -0.10, "grade saturation")
+check(grade.TintColor.B >= grade.TintColor.R, "the grade tint must be cool, not warm")
 
 -- Light budget as density, so it scales with the map instead of being re-tuned by hand.
 local budget = stub.lightBudget()
@@ -103,10 +115,28 @@ for _, enemy in stub.enemies() do
 	for _, node in enemy:GetDescendants() do inEnemy[node] = true end
 end
 
+local buildable = {
+	Part = true, WedgePart = true, CornerWedgePart = true, SpawnLocation = true, MeshPart = true,
+}
 local floors, blueParts, neonScenery, scenery, widestGlow = 0, 0, 0, 0, 0
 local floorLuminance
+local smooth, structural, curved, opaqueNeon = 0, 0, 0, 0
 for _, node in world:GetDescendants() do
-	if node.ClassName == "Part" or node.ClassName == "SpawnLocation" then
+	-- Scenery only. Enemy eyes and soul cores are deliberately small bright points and
+	-- are budgeted separately; counting them here would hide a glowing building.
+	if buildable[node.ClassName] and not inEnemy[node] then
+		structural += 1
+		if node.Material and node.Material.Name == "SmoothPlastic" then smooth += 1 end
+		if node.ClassName == "WedgePart" or node.ClassName == "CornerWedgePart"
+			or node:FindFirstChildOfClass("SpecialMesh")
+			or (node.Shape and node.Shape.Name == "Ball") then
+			curved += 1
+		end
+		if node.Material and node.Material.Name == "Neon" and (node.Transparency or 0) < 0.15 then
+			opaqueNeon += 1
+		end
+	end
+	if buildable[node.ClassName] then
 		if isBlue(node.Color) then blueParts += 1 end
 		local neon = node.Material and node.Material.Name == "Neon"
 		if neon then
@@ -114,7 +144,8 @@ for _, node in world:GetDescendants() do
 			-- of any one emissive surface rather than just counting them.
 			local size = node.Size
 			local face = math.max(size.X * size.Y, size.Y * size.Z, size.X * size.Z)
-			widestGlow = math.max(widestGlow, face)
+			-- Weighted by opacity: a big pane at 0.8 transparency is a haze, not a slab.
+			widestGlow = math.max(widestGlow, face * (1 - (node.Transparency or 0)))
 		end
 		if not inEnemy[node] then
 			scenery += 1
@@ -128,9 +159,16 @@ for _, node in world:GetDescendants() do
 	end
 end
 check(floors == 2, "both zones need a readable arena floor")
-check(blueParts == 0, `the palette must carry no blue surfaces, found {blueParts}`)
-check(neonScenery / scenery < 0.12, `neon is on {math.floor(neonScenery / scenery * 100)}% of scenery; it is meant to be rationed`)
-check(widestGlow <= 900, `a single emissive face of {math.floor(widestGlow)} sq studs is a glowing slab, not an accent`)
+-- Not a ban any more: the dark-anime base wants indigo. A cool accent is fine, a blue
+-- map is not, so this caps the share rather than forbidding the hue.
+check(blueParts / structural < 0.03, `{math.floor(blueParts / structural * 100)}% of surfaces are blue-dominant; indigo is an accent, not the palette`)
+check(neonScenery / scenery < 0.18, `neon is on {math.floor(neonScenery / scenery * 100)}% of scenery; it is meant to be rationed`)
+check(widestGlow <= 400, `an emissive face of {math.floor(widestGlow)} effective sq studs is a glowing slab, not an accent`)
+check(opaqueNeon == 0, `{opaqueNeon} opaque neon parts; glow must be translucent`)
+
+-- The blocky complaint, as a number. Stacked boxes are the failure mode.
+check(smooth / structural >= 0.75, `only {math.floor(smooth / structural * 100)}% of parts are SmoothPlastic`)
+check(curved / structural >= 0.2, `only {math.floor(curved / structural * 100)}% of parts are wedges, cylinders or spheres; it still reads as boxes`)
 
 for _, enemy in stub.enemies(1) do
 	local glowing = 0
@@ -152,7 +190,9 @@ check(countNamed("CurtainWall") >= 8, "both zones must be walled, not floating p
 check(countNamed("Merlon") >= 60, "battlements are what make a wall read as a fortification")
 check(countNamed("TowerShaft") >= 12, "the kingdom needs towers on its walls and gates")
 check(countNamed("HouseWall") >= 18, "a village means buildings, not an empty arena")
-check(countNamed("Roof") >= 60, "pitched roofs are most of the medieval silhouette")
+-- Two wedges per roof now, not six stacked slabs, so the count is lower by design.
+check(countNamed("Roof") >= 30, "pitched roofs are most of the medieval silhouette")
+check(countNamed("SpireFace") >= 40, "faceted spires are what replaced the stepped cones")
 check(countNamed("Door") >= 18, "buildings need doors to read as buildings")
 check(countNamed("Cobble") >= 3, "streets give the town a shape to walk along")
 check(countNamed("Banner") >= 10, "banners make the ruin read as inhabited")

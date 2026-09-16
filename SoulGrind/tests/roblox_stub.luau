@@ -158,6 +158,7 @@ local Instance = {}
 
 local classParents = {
 	Part = "BasePart", SpawnLocation = "Part", MeshPart = "BasePart",
+	WedgePart = "BasePart", CornerWedgePart = "BasePart", TrussPart = "BasePart",
 	Script = "LuaSourceContainer", LocalScript = "LuaSourceContainer", ModuleScript = "LuaSourceContainer",
 	TextLabel = "GuiObject", TextButton = "GuiObject", Frame = "GuiObject", ImageLabel = "GuiObject",
 }
@@ -250,6 +251,9 @@ local function newInstance(className)
 	properties.Material = Enum.Material.Plastic
 	properties.Transparency = 0
 	properties.CanCollide = true
+	if className == "WedgePart" or className == "CornerWedgePart" then
+		properties.CanCollide = true
+	end
 	if className == "Humanoid" then
 		properties.MaxHealth = 100
 		properties.Health = 100
