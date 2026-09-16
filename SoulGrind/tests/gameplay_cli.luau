@@ -67,7 +67,8 @@ band(luminance(stub.Lighting.Ambient), 0.16, 0.32, "ambient luminance")
 band(luminance(stub.Lighting.OutdoorAmbient), 0.2, 0.38, "outdoor ambient luminance")
 band(stub.Lighting.Brightness, 1.5, 2.4, "global brightness")
 band(stub.Lighting.ExposureCompensation, -0.4, 0.15, "exposure compensation")
-band(stub.Lighting.FogStart, 100, 320, "fog start")
+-- Tight on purpose: the map has to reveal itself as you walk into it.
+band(stub.Lighting.FogStart, 55, 200, "fog start")
 
 local atmosphere = stub.Lighting:FindFirstChildOfClass("Atmosphere")
 check(atmosphere ~= nil, "the underworld needs an Atmosphere")
@@ -147,13 +148,26 @@ local function countNamed(name)
 	end
 	return total
 end
-check(countNamed("PillarShaft") >= 20, "the arena needs a colonnade, not a bare slab")
-check(countNamed("Banner") >= 10, "banners are what make the ruin read as inhabited")
-check(countNamed("Spire") >= 20, "the horizon needs a silhouette instead of empty fog")
-check(countNamed("FarRidge") >= 10, "distant ridges give the sky something to cut against")
-check(countNamed("RampartX") >= 2, "the arena must be enclosed, not a floating pad")
-check(countNamed("MonumentCrown") == 2, "each zone needs a landmark visible from anywhere in it")
-check(countNamed("LavaSeam") >= 6, "lava seams carry the crimson without lighting the whole floor")
+check(countNamed("CurtainWall") >= 8, "both zones must be walled, not floating pads")
+check(countNamed("Merlon") >= 60, "battlements are what make a wall read as a fortification")
+check(countNamed("TowerShaft") >= 12, "the kingdom needs towers on its walls and gates")
+check(countNamed("HouseWall") >= 18, "a village means buildings, not an empty arena")
+check(countNamed("Roof") >= 60, "pitched roofs are most of the medieval silhouette")
+check(countNamed("Door") >= 18, "buildings need doors to read as buildings")
+check(countNamed("Cobble") >= 3, "streets give the town a shape to walk along")
+check(countNamed("Banner") >= 10, "banners make the ruin read as inhabited")
+check(countNamed("FarRidge") >= 10, "a distant ridge gives the sky something to cut against")
+check(countNamed("Portcullis") >= 5, "the gatehouse needs a gate")
+
+-- Buildings must actually stand between the spawn and the far end of the map, or the
+-- player can read the whole level from the entrance.
+local blockers, spawnZ = 0, Config.ArenaHalf.Z - 30
+for _, node in world:GetDescendants() do
+	if node.Name == "HouseWall" or node.Name == "TowerShaft" or node.Name == "CurtainWall" then
+		if node.Size.Y >= 12 and node.CanCollide then blockers += 1 end
+	end
+end
+check(blockers >= 25, `only {blockers} tall solid structures; sightlines stay wide open`)
 
 -- ------------------------------------------------------ enemy readability ---
 -- Mid-tone bodies: not black silhouettes, not blown out. They read by contrast and hue.

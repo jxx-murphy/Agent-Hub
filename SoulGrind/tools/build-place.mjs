@@ -58,7 +58,10 @@ for (const [label, source] of [["server", main], ["client", client]]) {
 }
 if (!main.includes("World.setObjective")) throw new Error("The server must push the active quest to the world signs");
 if (!world.includes("SurfaceGui")) throw new Error("The world must carry readable signs, not just floating labels");
-if (!world.includes("registerQuestSign")) throw new Error("The world must register its quest signs");
+if (!world.includes("signBoards")) throw new Error("The world must collect its quest signs");
+if (!world.includes("function World.setObjective")) throw new Error("The world must expose setObjective");
+// A lit SurfaceGui in a night map is an unreadable one; this is why signs looked blank.
+if (!world.includes("LightInfluence = 0")) throw new Error("Sign faces must not be dimmed by scene lighting");
 
 // Enemies hold a post and disengage. Without a leash they chase across the whole map.
 for (const required of ["Engage", "Leash", "RegenPerSecond"]) {

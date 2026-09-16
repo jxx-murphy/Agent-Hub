@@ -17,8 +17,8 @@ return {
 	-- Enemies hold a post. They wake when you come close, chase while you stay inside
 	-- the leash, then walk home and heal. Nothing follows you across the map forever.
 	Aggro = {
-		Engage = 44,
-		Leash = 86,
+		Engage = 28,
+		Leash = 62,
 		ReturnSpeed = 1.4,
 		RegenPerSecond = 9,
 		CalmSeconds = 4,
@@ -43,6 +43,12 @@ return {
 		CrimsonLit = Color3.fromRGB(217, 82, 74),
 		Iron = Color3.fromRGB(58, 52, 54),
 		Ember = Color3.fromRGB(224, 138, 60),
+		-- Medieval building materials. Dark, but never black.
+		Plaster = Color3.fromRGB(128, 116, 104),
+		Timber = Color3.fromRGB(84, 60, 44),
+		Roof = Color3.fromRGB(72, 52, 54),
+		Cobble = Color3.fromRGB(104, 92, 88),
+		CrimsonDeep = Color3.fromRGB(96, 30, 30),
 	},
 
 	-- Progression spends souls on the moves themselves, not only on a damage number.
@@ -100,24 +106,24 @@ return {
 
 	Zones = {
 		[1] = {
-			Name = "Cinder Hollow",
+			Name = "Ashenfall Village",
 			Origin = Vector3.new(0, 0, 0),
 			Accent = Color3.fromRGB(184, 54, 47),
 			AccentLight = Color3.fromRGB(217, 82, 74),
-			Floor = Color3.fromRGB(96, 78, 76),
-			FloorAlt = Color3.fromRGB(116, 95, 90),
+			Floor = Color3.fromRGB(88, 76, 68),
+			FloorAlt = Color3.fromRGB(108, 94, 84),
 			Stone = Color3.fromRGB(134, 112, 106),
 			EnemyHealth = 36,
 			EnemyDamage = 7,
 			SoulReward = 10,
 		},
 		[2] = {
-			Name = "Molten Reliquary",
+			Name = "Blackspire Keep",
 			Origin = Vector3.new(520, 0, 0),
 			Accent = Color3.fromRGB(201, 162, 74),
 			AccentLight = Color3.fromRGB(232, 200, 120),
-			Floor = Color3.fromRGB(104, 84, 70),
-			FloorAlt = Color3.fromRGB(126, 102, 82),
+			Floor = Color3.fromRGB(96, 88, 84),
+			FloorAlt = Color3.fromRGB(118, 108, 102),
 			Stone = Color3.fromRGB(142, 120, 96),
 			EnemyHealth = 95,
 			EnemyDamage = 12,

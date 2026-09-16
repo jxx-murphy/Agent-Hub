@@ -545,8 +545,8 @@ end
 
 local function render(state)
 	latestState = state
-	local zoneNames = { "CINDER HOLLOW", "MOLTEN RELIQUARY" }
-	zoneTag.Text = zoneNames[state.Zone] or `ZONE {state.Zone}`
+	local zone = Config.Zones[state.Zone]
+	zoneTag.Text = zone and zone.Name:upper() or `ZONE {state.Zone}`
 	stats.Text = `{state.Souls} SOULS     LV {state.Level}     {state.Damage} DMG\n{state.Rebirths} REBIRTHS{state.FriendBonus and "     +10% CO-PLAY" or ""}`
 
 	local quests = state.Quests or { Progress = {}, Completed = 0, Total = Quests.count, Rate = 0 }
@@ -618,7 +618,7 @@ local function render(state)
 	local seconds = math.min(state.ActiveSeconds, 600)
 	checkIn.Text = `ACTIVE CHECK-IN  {math.floor(seconds / 60)}:{string.format("%02d", seconds % 60)} / 10:00\nRequires 3 shades today • Reward: 2 free flares{state.CheckInClaimed and " • Complete" or ""}`
 	claim.Text = state.DailyClaimed and "DAILY CLAIMED" or "CLAIM DAILY"
-	gateButton.Text = state.MaxZone >= 2 and "ENTER\nRELIQUARY" or "OPEN ASH GATE\n150 SOULS"
+	gateButton.Text = state.MaxZone >= 2 and "ENTER\nBLACKSPIRE KEEP" or "OPEN ASH GATE\n150 SOULS"
 	travelButton.Text = state.Zone == 1 and "TRAVEL\nZONE 2" or "TRAVEL\nZONE 1"
 	rebirth.Text = `REBIRTH\n{state.RebirthCost} SOULS`
 	flare.Text = `SOUL FLARE\n{state.FlareCount} READY`
