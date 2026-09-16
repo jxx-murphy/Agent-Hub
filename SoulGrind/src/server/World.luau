@@ -135,26 +135,30 @@ end
 -- Lighting ------------------------------------------------------------------
 -- Roughly 70% of the look. Cold desaturated base, punchy contrast, warm glow.
 function World.applyLighting()
-	Lighting.ClockTime = 0.15
+	-- BRIGHTNESS KNOBS. Raise Ambient first if it is still too dark: it lifts shadows
+	-- without blowing out highlights, which is the failure mode Brightness/Exposure hit.
+	-- ClockTime 6.2 is dawn, so there is a real sun giving shape instead of flat night.
+	Lighting.ClockTime = 6.2
 	Lighting.GeographicLatitude = 30
-	Lighting.Brightness = 1.6
-	Lighting.ExposureCompensation = 0.05
-	Lighting.Ambient = Color3.fromRGB(52, 50, 66)
-	Lighting.OutdoorAmbient = Color3.fromRGB(62, 60, 80)
-	Lighting.FogColor = Color3.fromRGB(20, 18, 30)
-	Lighting.FogStart = 70
-	Lighting.FogEnd = 300
-	Lighting.EnvironmentDiffuseScale = 0.25
-	Lighting.EnvironmentSpecularScale = 0.2
+	Lighting.Brightness = 2.8
+	Lighting.ExposureCompensation = 0.28
+	Lighting.Ambient = Color3.fromRGB(112, 106, 130)
+	Lighting.OutdoorAmbient = Color3.fromRGB(128, 122, 148)
+	Lighting.FogColor = Color3.fromRGB(58, 52, 74)
+	Lighting.FogStart = 220
+	Lighting.FogEnd = 850
+	Lighting.EnvironmentDiffuseScale = 0.5
+	Lighting.EnvironmentSpecularScale = 0.3
 	Lighting.GlobalShadows = true
 
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
-	atmosphere.Density = 0.34
-	atmosphere.Haze = 2.4
-	atmosphere.Glare = 0.08
-	atmosphere.Offset = 0.15
-	atmosphere.Color = Color3.fromRGB(116, 110, 148)
-	atmosphere.Decay = Color3.fromRGB(32, 28, 46)
+	-- Thick haze was doing as much damage as the low ambient.
+	atmosphere.Density = 0.16
+	atmosphere.Haze = 0.9
+	atmosphere.Glare = 0.05
+	atmosphere.Offset = 0.1
+	atmosphere.Color = Color3.fromRGB(168, 158, 196)
+	atmosphere.Decay = Color3.fromRGB(70, 62, 96)
 	atmosphere.Parent = Lighting
 
 	local function effect(className, name, properties)
@@ -167,12 +171,12 @@ function World.applyLighting()
 	-- Low threshold so soul drops, runes and portals bloom the way energy should.
 	effect("BloomEffect", "SoulBloom", { Intensity = 0.55, Size = 30, Threshold = 0.9 })
 	effect("ColorCorrectionEffect", "UnderworldGrade", {
-		Contrast = 0.22, Saturation = -0.2, Brightness = 0, TintColor = Color3.fromRGB(27, 21, 40),
+		Contrast = 0.18, Saturation = -0.12, Brightness = 0.06, TintColor = Color3.fromRGB(46, 38, 62),
 	})
 	-- Softens the far silhouette without touching the combat zone: the focus radius is
 	-- wider than any fight, so nothing the player is swinging at is ever blurred.
 	effect("DepthOfFieldEffect", "SoulDepth", {
-		FarIntensity = 0.32, FocusDistance = 60, InFocusRadius = 120, NearIntensity = 0,
+		FarIntensity = 0.22, FocusDistance = 90, InFocusRadius = 200, NearIntensity = 0,
 	})
 end
 

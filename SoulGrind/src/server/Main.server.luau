@@ -211,19 +211,19 @@ end)
 local archetypes = {
 	Shade = {
 		Name = "CINDER SHADE", Health = 1, Damage = 1, Speed = 11, Reward = 1, Range = 5, Cooldown = 1.15,
-		Body = Color3.fromRGB(142, 116, 116), Trim = Color3.fromRGB(217, 82, 74),
+		Body = Color3.fromRGB(96, 72, 78), Trim = Color3.fromRGB(255, 96, 86),
 	},
 	Reaver = {
 		Name = "BONE REAVER", Health = 1.75, Damage = 1.35, Speed = 8, Reward = 1.65, Range = 6, Cooldown = 1.55,
-		Body = Color3.fromRGB(156, 112, 78), Trim = Color3.fromRGB(224, 138, 60),
+		Body = Color3.fromRGB(118, 80, 52), Trim = Color3.fromRGB(255, 158, 70),
 	},
 	Wisp = {
 		Name = "ASH WISP", Health = 0.7, Damage = 0.8, Speed = 14, Reward = 1.25, Range = 4.5, Cooldown = 0.9,
-		Body = Color3.fromRGB(186, 168, 126), Trim = Color3.fromRGB(255, 233, 168),
+		Body = Color3.fromRGB(206, 190, 146), Trim = Color3.fromRGB(255, 244, 196),
 	},
 	Warden = {
 		Name = "GILDED WARDEN", Health = 4.5, Damage = 1.55, Speed = 7, Reward = 5, Range = 7, Cooldown = 1.4,
-		Body = Color3.fromRGB(170, 86, 74), Trim = Color3.fromRGB(201, 162, 74),
+		Body = Color3.fromRGB(132, 58, 50), Trim = Color3.fromRGB(255, 196, 92),
 	},
 }
 

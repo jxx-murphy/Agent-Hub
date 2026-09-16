@@ -29,24 +29,24 @@ return {
 	-- Dark anime base: charcoal, indigo-cooled slate and obsidian. Emissive accents stay
 	-- warm (crimson, amber, ember) so fire reads against a cold world instead of joining it.
 	Palette = {
-		Obsidian = Color3.fromRGB(26, 24, 34),
-		Charcoal = Color3.fromRGB(40, 39, 48),
-		Indigo = Color3.fromRGB(44, 42, 68),
-		Slate = Color3.fromRGB(64, 63, 80),
-		SlateLight = Color3.fromRGB(86, 85, 104),
-		Bedrock = Color3.fromRGB(22, 21, 30),
-		Rock = Color3.fromRGB(52, 51, 66),
-		RockLight = Color3.fromRGB(74, 73, 92),
-		Floor = Color3.fromRGB(70, 68, 86),
-		FloorAlt = Color3.fromRGB(88, 86, 106),
-		Stone = Color3.fromRGB(104, 102, 124),
-		StoneDark = Color3.fromRGB(58, 57, 74),
+		Obsidian = Color3.fromRGB(58, 54, 56),
+		Charcoal = Color3.fromRGB(82, 78, 78),
+		Indigo = Color3.fromRGB(78, 74, 114),
+		Slate = Color3.fromRGB(116, 112, 110),
+		SlateLight = Color3.fromRGB(150, 146, 142),
+		Bedrock = Color3.fromRGB(54, 50, 52),
+		Rock = Color3.fromRGB(104, 100, 98),
+		RockLight = Color3.fromRGB(134, 130, 126),
+		Floor = Color3.fromRGB(130, 124, 118),
+		FloorAlt = Color3.fromRGB(154, 148, 140),
+		Stone = Color3.fromRGB(164, 158, 150),
+		StoneDark = Color3.fromRGB(108, 104, 100),
 		Bone = Color3.fromRGB(206, 202, 214),
-		Plaster = Color3.fromRGB(112, 110, 130),
-		Timber = Color3.fromRGB(62, 52, 60),
-		Roof = Color3.fromRGB(46, 44, 62),
-		Cobble = Color3.fromRGB(78, 77, 94),
-		Iron = Color3.fromRGB(38, 37, 48),
+		Plaster = Color3.fromRGB(178, 172, 162),
+		Timber = Color3.fromRGB(112, 88, 70),
+		Roof = Color3.fromRGB(94, 86, 86),
+		Cobble = Color3.fromRGB(138, 134, 128),
+		Iron = Color3.fromRGB(78, 74, 74),
 		Gold = Color3.fromRGB(201, 162, 74),
 		GoldLight = Color3.fromRGB(232, 200, 120),
 		GoldPale = Color3.fromRGB(255, 233, 168),
@@ -117,9 +117,9 @@ return {
 			Origin = Vector3.new(0, 0, 0),
 			Accent = Color3.fromRGB(184, 54, 47),
 			AccentLight = Color3.fromRGB(217, 82, 74),
-			Floor = Color3.fromRGB(66, 64, 82),
-			FloorAlt = Color3.fromRGB(84, 82, 102),
-			Stone = Color3.fromRGB(104, 102, 124),
+			Floor = Color3.fromRGB(126, 120, 112),
+			FloorAlt = Color3.fromRGB(152, 146, 138),
+			Stone = Color3.fromRGB(164, 158, 150),
 			EnemyHealth = 36,
 			EnemyDamage = 7,
 			SoulReward = 10,
@@ -129,9 +129,9 @@ return {
 			Origin = Vector3.new(520, 0, 0),
 			Accent = Color3.fromRGB(201, 162, 74),
 			AccentLight = Color3.fromRGB(232, 200, 120),
-			Floor = Color3.fromRGB(74, 70, 88),
-			FloorAlt = Color3.fromRGB(92, 88, 108),
-			Stone = Color3.fromRGB(112, 108, 130),
+			Floor = Color3.fromRGB(132, 126, 120),
+			FloorAlt = Color3.fromRGB(158, 152, 144),
+			Stone = Color3.fromRGB(168, 162, 154),
 			EnemyHealth = 95,
 			EnemyDamage = 12,
 			SoulReward = 28,
@@ -411,26 +411,30 @@ end
 -- Lighting ------------------------------------------------------------------
 -- Roughly 70% of the look. Cold desaturated base, punchy contrast, warm glow.
 function World.applyLighting()
-	Lighting.ClockTime = 0.15
+	-- BRIGHTNESS KNOBS. Raise Ambient first if it is still too dark: it lifts shadows
+	-- without blowing out highlights, which is the failure mode Brightness/Exposure hit.
+	-- ClockTime 6.2 is dawn, so there is a real sun giving shape instead of flat night.
+	Lighting.ClockTime = 6.2
 	Lighting.GeographicLatitude = 30
-	Lighting.Brightness = 1.6
-	Lighting.ExposureCompensation = 0.05
-	Lighting.Ambient = Color3.fromRGB(52, 50, 66)
-	Lighting.OutdoorAmbient = Color3.fromRGB(62, 60, 80)
-	Lighting.FogColor = Color3.fromRGB(20, 18, 30)
-	Lighting.FogStart = 70
-	Lighting.FogEnd = 300
-	Lighting.EnvironmentDiffuseScale = 0.25
-	Lighting.EnvironmentSpecularScale = 0.2
+	Lighting.Brightness = 2.8
+	Lighting.ExposureCompensation = 0.28
+	Lighting.Ambient = Color3.fromRGB(112, 106, 130)
+	Lighting.OutdoorAmbient = Color3.fromRGB(128, 122, 148)
+	Lighting.FogColor = Color3.fromRGB(58, 52, 74)
+	Lighting.FogStart = 220
+	Lighting.FogEnd = 850
+	Lighting.EnvironmentDiffuseScale = 0.5
+	Lighting.EnvironmentSpecularScale = 0.3
 	Lighting.GlobalShadows = true
 
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
-	atmosphere.Density = 0.34
-	atmosphere.Haze = 2.4
-	atmosphere.Glare = 0.08
-	atmosphere.Offset = 0.15
-	atmosphere.Color = Color3.fromRGB(116, 110, 148)
-	atmosphere.Decay = Color3.fromRGB(32, 28, 46)
+	-- Thick haze was doing as much damage as the low ambient.
+	atmosphere.Density = 0.16
+	atmosphere.Haze = 0.9
+	atmosphere.Glare = 0.05
+	atmosphere.Offset = 0.1
+	atmosphere.Color = Color3.fromRGB(168, 158, 196)
+	atmosphere.Decay = Color3.fromRGB(70, 62, 96)
 	atmosphere.Parent = Lighting
 
 	local function effect(className, name, properties)
@@ -443,12 +447,12 @@ function World.applyLighting()
 	-- Low threshold so soul drops, runes and portals bloom the way energy should.
 	effect("BloomEffect", "SoulBloom", { Intensity = 0.55, Size = 30, Threshold = 0.9 })
 	effect("ColorCorrectionEffect", "UnderworldGrade", {
-		Contrast = 0.22, Saturation = -0.2, Brightness = 0, TintColor = Color3.fromRGB(27, 21, 40),
+		Contrast = 0.18, Saturation = -0.12, Brightness = 0.06, TintColor = Color3.fromRGB(46, 38, 62),
 	})
 	-- Softens the far silhouette without touching the combat zone: the focus radius is
 	-- wider than any fight, so nothing the player is swinging at is ever blurred.
 	effect("DepthOfFieldEffect", "SoulDepth", {
-		FarIntensity = 0.32, FocusDistance = 60, InFocusRadius = 120, NearIntensity = 0,
+		FarIntensity = 0.22, FocusDistance = 90, InFocusRadius = 200, NearIntensity = 0,
 	})
 end
 
@@ -1682,19 +1686,19 @@ end)
 local archetypes = {
 	Shade = {
 		Name = "CINDER SHADE", Health = 1, Damage = 1, Speed = 11, Reward = 1, Range = 5, Cooldown = 1.15,
-		Body = Color3.fromRGB(142, 116, 116), Trim = Color3.fromRGB(217, 82, 74),
+		Body = Color3.fromRGB(96, 72, 78), Trim = Color3.fromRGB(255, 96, 86),
 	},
 	Reaver = {
 		Name = "BONE REAVER", Health = 1.75, Damage = 1.35, Speed = 8, Reward = 1.65, Range = 6, Cooldown = 1.55,
-		Body = Color3.fromRGB(156, 112, 78), Trim = Color3.fromRGB(224, 138, 60),
+		Body = Color3.fromRGB(118, 80, 52), Trim = Color3.fromRGB(255, 158, 70),
 	},
 	Wisp = {
 		Name = "ASH WISP", Health = 0.7, Damage = 0.8, Speed = 14, Reward = 1.25, Range = 4.5, Cooldown = 0.9,
-		Body = Color3.fromRGB(186, 168, 126), Trim = Color3.fromRGB(255, 233, 168),
+		Body = Color3.fromRGB(206, 190, 146), Trim = Color3.fromRGB(255, 244, 196),
 	},
 	Warden = {
 		Name = "GILDED WARDEN", Health = 4.5, Damage = 1.55, Speed = 7, Reward = 5, Range = 7, Cooldown = 1.4,
-		Body = Color3.fromRGB(170, 86, 74), Trim = Color3.fromRGB(201, 162, 74),
+		Body = Color3.fromRGB(132, 58, 50), Trim = Color3.fromRGB(255, 196, 92),
 	},
 }
 

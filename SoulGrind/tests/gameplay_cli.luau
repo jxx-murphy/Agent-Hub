@@ -63,16 +63,20 @@ check(widest > 120, `enemies must be spread across the arena, widest gap was {ma
 -- ------------------------------------------------------------ readability ---
 -- A band, not a floor. Too dark reads as a black screen; too bright washed the whole
 -- arena into a magenta smear. Both walls are asserted so neither mistake returns.
-band(luminance(stub.Lighting.Ambient), 0.16, 0.32, "ambient luminance")
-band(luminance(stub.Lighting.OutdoorAmbient), 0.2, 0.38, "outdoor ambient luminance")
-band(stub.Lighting.Brightness, 1.5, 2.4, "global brightness")
-band(stub.Lighting.ExposureCompensation, -0.4, 0.15, "exposure compensation")
+-- These ceilings were set right after the magenta whiteout and were far too tight;
+-- the map came out unplayably dark. Ambient is the safe lever (it lifts shadows without
+-- clipping highlights), so it gets the widest range. The real anti-whiteout guards are
+-- further down: bloom intensity, emissive area, and light density.
+band(luminance(stub.Lighting.Ambient), 0.30, 0.58, "ambient luminance")
+band(luminance(stub.Lighting.OutdoorAmbient), 0.34, 0.64, "outdoor ambient luminance")
+band(stub.Lighting.Brightness, 2.0, 3.4, "global brightness")
+band(stub.Lighting.ExposureCompensation, -0.2, 0.45, "exposure compensation")
 -- Tight on purpose: the map has to reveal itself as you walk into it.
-band(stub.Lighting.FogStart, 55, 200, "fog start")
+band(stub.Lighting.FogStart, 150, 420, "fog start")
 
 local atmosphere = stub.Lighting:FindFirstChildOfClass("Atmosphere")
 check(atmosphere ~= nil, "the underworld needs an Atmosphere")
-band(atmosphere.Density, 0.15, 0.36, "atmosphere density")
+band(atmosphere.Density, 0.08, 0.26, "atmosphere density")
 -- Depth of field is wanted now, but only on the far field. If the in-focus radius ever
 -- shrinks to combat range the player is swinging at a blurred target.
 local depth = stub.Lighting:FindFirstChild("SoulDepth")
@@ -89,9 +93,9 @@ check(bloom.Threshold <= 1.2, "the glow threshold must be low enough for runes a
 check(bloom.Intensity <= 0.8, `bloom intensity {bloom.Intensity} will smear the whole frame`)
 
 local grade = stub.Lighting:FindFirstChild("UnderworldGrade")
-check(grade ~= nil and grade.Brightness <= 0.02, "colour grading must not stack more exposure on top")
+check(grade ~= nil and grade.Brightness <= 0.12, "colour grading must not stack too much exposure on top")
 band(grade.Contrast, 0.15, 0.30, "grade contrast")
-band(grade.Saturation, -0.30, -0.10, "grade saturation")
+band(grade.Saturation, -0.30, -0.05, "grade saturation")
 check(grade.TintColor.B >= grade.TintColor.R, "the grade tint must be cool, not warm")
 
 -- Light budget as density, so it scales with the map instead of being re-tuned by hand.
@@ -154,7 +158,7 @@ for _, node in world:GetDescendants() do
 		if node.Name == "ArenaFloor" then
 			floors += 1
 			floorLuminance = floorLuminance or luminance(node.Color)
-			band(luminance(node.Color), 0.22, 0.45, "arena floor luminance")
+			band(luminance(node.Color), 0.32, 0.70, "arena floor luminance")
 		end
 	end
 end
@@ -218,7 +222,7 @@ for _, enemy in stub.enemies(1) do
 	local torso = enemy:FindFirstChild("Torso")
 	check(torso ~= nil, `{enemy.Name} has no body`)
 	local tone = luminance(torso.Color)
-	band(tone, 0.25, 0.72, `{enemy.Name} body tone`)
+	band(tone, 0.22, 0.78, `{enemy.Name} body tone`)
 	check(math.abs(tone - floorLuminance) > 0.07, `{enemy.Name} is too close to the floor tone to read`)
 	check(enemy:FindFirstChild("SoulOutline") == nil, "enemies must not carry a permanent outline any more")
 	check(enemy:FindFirstChild("Eye") ~= nil, `{enemy.Name} needs eyes to read at distance`)
