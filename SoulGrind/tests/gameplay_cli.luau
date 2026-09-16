@@ -67,36 +67,37 @@ check(widest > 120, `enemies must be spread across the arena, widest gap was {ma
 -- the map came out unplayably dark. Ambient is the safe lever (it lifts shadows without
 -- clipping highlights), so it gets the widest range. The real anti-whiteout guards are
 -- further down: bloom intensity, emissive area, and light density.
-band(luminance(stub.Lighting.Ambient), 0.30, 0.58, "ambient luminance")
-band(luminance(stub.Lighting.OutdoorAmbient), 0.34, 0.64, "outdoor ambient luminance")
-band(stub.Lighting.Brightness, 2.0, 3.4, "global brightness")
-band(stub.Lighting.ExposureCompensation, -0.2, 0.45, "exposure compensation")
--- Tight on purpose: the map has to reveal itself as you walk into it.
-band(stub.Lighting.FogStart, 150, 420, "fog start")
+band(luminance(stub.Lighting.Ambient), 0.24, 0.44, "ambient luminance")
+band(luminance(stub.Lighting.OutdoorAmbient), 0.28, 0.50, "outdoor ambient luminance")
+band(stub.Lighting.Brightness, 1.4, 2.6, "global brightness")
+band(stub.Lighting.ExposureCompensation, -0.3, 0.25, "exposure compensation")
+-- Clear look: fog must sit past everything the player can see, not veil the map.
+check(stub.Lighting.FogStart >= 1000, `fog starting at {stub.Lighting.FogStart} studs veils the map`)
+check(stub.Lighting.FogEnd >= 20000, "fog must be pushed out of play entirely")
 
 local atmosphere = stub.Lighting:FindFirstChildOfClass("Atmosphere")
 check(atmosphere ~= nil, "the underworld needs an Atmosphere")
-band(atmosphere.Density, 0.08, 0.26, "atmosphere density")
--- Depth of field is wanted now, but only on the far field. If the in-focus radius ever
--- shrinks to combat range the player is swinging at a blurred target.
-local depth = stub.Lighting:FindFirstChild("SoulDepth")
-check(depth ~= nil, "the far silhouette needs softening")
-check(depth.InFocusRadius >= 90, `focus radius {depth.InFocusRadius} would blur the fight itself`)
-check(depth.FarIntensity <= 0.5, "far blur this strong turns the backdrop to soup")
-check(depth.NearIntensity == 0, "near blur makes the world swim")
+band(atmosphere.Density, 0, 0.1, "atmosphere density")
+-- Haze and glare are what made the image milky. Both must stay off.
+check(atmosphere.Haze <= 0.05, `atmosphere haze {atmosphere.Haze} is the cloudy look`)
+check(atmosphere.Glare <= 0.05, `atmosphere glare {atmosphere.Glare} hazes every light source`)
+-- No depth of field. Distance blur was half of why the map looked cloudy.
+check(stub.Lighting:FindFirstChild("SoulDepth") == nil, "depth of field makes the distance look foggy")
 
--- A low bloom threshold is the anime glow. It is also how the magenta whiteout happened,
--- so intensity, exposure, ambient and light density stay capped to hold the line.
+-- Bloom only on genuine emissives. Below ~1.4 every lit wall glows and that haze is
+-- indistinguishable from fog.
 local bloom = stub.Lighting:FindFirstChild("SoulBloom")
 check(bloom ~= nil, "energy needs a bloom pass")
-check(bloom.Threshold <= 1.2, "the glow threshold must be low enough for runes and portals to bloom")
-check(bloom.Intensity <= 0.8, `bloom intensity {bloom.Intensity} will smear the whole frame`)
+check(bloom.Threshold >= 1.4, `bloom threshold {bloom.Threshold} makes ordinary lit surfaces glow`)
+check(bloom.Intensity <= 0.4, `bloom intensity {bloom.Intensity} will smear the whole frame`)
 
 local grade = stub.Lighting:FindFirstChild("UnderworldGrade")
 check(grade ~= nil and grade.Brightness <= 0.12, "colour grading must not stack too much exposure on top")
 band(grade.Contrast, 0.15, 0.30, "grade contrast")
 band(grade.Saturation, -0.30, -0.05, "grade saturation")
 check(grade.TintColor.B >= grade.TintColor.R, "the grade tint must be cool, not warm")
+-- A near-black tint multiplies the whole image down and muddies it.
+check(luminance(grade.TintColor) >= 0.7, "the grade tint must not crush the image")
 
 -- Light budget as density, so it scales with the map instead of being re-tuned by hand.
 local budget = stub.lightBudget()

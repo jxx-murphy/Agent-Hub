@@ -133,32 +133,43 @@ local function addLabel(part, text, color, height, maxDistance)
 end
 
 -- Lighting ------------------------------------------------------------------
--- Roughly 70% of the look. Cold desaturated base, punchy contrast, warm glow.
+-- Clear, not cloudy. Five separate things were adding haze and they are all off now:
+-- distance fog, Atmosphere haze, Atmosphere glare, depth-of-field blur, and a bloom
+-- threshold so low that every lit surface glowed. Visibility comes from ambient light
+-- alone, which is what keeps the image crisp.
+
+-- The only four values worth touching. Nudge EXPOSURE first: +0.1 is brighter,
+-- -0.1 is darker, and it changes nothing else about the look.
+local EXPOSURE = 0
+local SUN = 1.8
+local AMBIENT = Color3.fromRGB(78, 75, 88)
+local OUTDOOR = Color3.fromRGB(92, 89, 104)
+
 function World.applyLighting()
-	-- BRIGHTNESS KNOBS. Raise Ambient first if it is still too dark: it lifts shadows
-	-- without blowing out highlights, which is the failure mode Brightness/Exposure hit.
-	-- ClockTime 6.2 is dawn, so there is a real sun giving shape instead of flat night.
-	Lighting.ClockTime = 6.2
+	Lighting.ClockTime = 6.6
 	Lighting.GeographicLatitude = 30
-	Lighting.Brightness = 2.8
-	Lighting.ExposureCompensation = 0.28
-	Lighting.Ambient = Color3.fromRGB(112, 106, 130)
-	Lighting.OutdoorAmbient = Color3.fromRGB(128, 122, 148)
-	Lighting.FogColor = Color3.fromRGB(58, 52, 74)
-	Lighting.FogStart = 220
-	Lighting.FogEnd = 850
-	Lighting.EnvironmentDiffuseScale = 0.5
-	Lighting.EnvironmentSpecularScale = 0.3
+	Lighting.Brightness = SUN
+	Lighting.ExposureCompensation = EXPOSURE
+	Lighting.Ambient = AMBIENT
+	Lighting.OutdoorAmbient = OUTDOOR
+	Lighting.EnvironmentDiffuseScale = 0.35
+	Lighting.EnvironmentSpecularScale = 0.25
 	Lighting.GlobalShadows = true
 
+	-- Fog pushed past the far ridge. Nothing in play is ever veiled.
+	Lighting.FogColor = Color3.fromRGB(38, 34, 48)
+	Lighting.FogStart = 4000
+	Lighting.FogEnd = 100000
+
+	-- Haze is the milky look, glare is the bloom-on-everything look. Both to zero.
+	-- Density stays just above zero so the sky is not a flat plate.
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
-	-- Thick haze was doing as much damage as the low ambient.
-	atmosphere.Density = 0.16
-	atmosphere.Haze = 0.9
-	atmosphere.Glare = 0.05
-	atmosphere.Offset = 0.1
-	atmosphere.Color = Color3.fromRGB(168, 158, 196)
-	atmosphere.Decay = Color3.fromRGB(70, 62, 96)
+	atmosphere.Density = 0.05
+	atmosphere.Haze = 0
+	atmosphere.Glare = 0
+	atmosphere.Offset = 0
+	atmosphere.Color = Color3.fromRGB(196, 192, 212)
+	atmosphere.Decay = Color3.fromRGB(88, 82, 104)
 	atmosphere.Parent = Lighting
 
 	local function effect(className, name, properties)
@@ -168,16 +179,18 @@ function World.applyLighting()
 		instance.Parent = Lighting
 	end
 
-	-- Low threshold so soul drops, runes and portals bloom the way energy should.
-	effect("BloomEffect", "SoulBloom", { Intensity = 0.55, Size = 30, Threshold = 0.9 })
+	-- Threshold raised well above 1 so only genuine emissives bloom: flames, runes,
+	-- portals. At 0.9 every lit wall bloomed, and that haze read as fog.
+	effect("BloomEffect", "SoulBloom", { Intensity = 0.25, Size = 16, Threshold = 1.9 })
+	-- Near-neutral tint. The old near-black tint muddied every surface; the cool cast
+	-- now comes from a slight blue lean, not from crushing the image.
 	effect("ColorCorrectionEffect", "UnderworldGrade", {
-		Contrast = 0.18, Saturation = -0.12, Brightness = 0.06, TintColor = Color3.fromRGB(46, 38, 62),
+		Contrast = 0.2, Saturation = -0.08, Brightness = 0, TintColor = Color3.fromRGB(228, 230, 246),
 	})
-	-- Softens the far silhouette without touching the combat zone: the focus radius is
-	-- wider than any fight, so nothing the player is swinging at is ever blurred.
-	effect("DepthOfFieldEffect", "SoulDepth", {
-		FarIntensity = 0.22, FocusDistance = 90, InFocusRadius = 200, NearIntensity = 0,
-	})
+
+	-- Depth of field is the other half of "cloudy". Gone.
+	local staleDepth = Lighting:FindFirstChild("SoulDepth")
+	if staleDepth then staleDepth:Destroy() end
 end
 
 -- Ambience ------------------------------------------------------------------
